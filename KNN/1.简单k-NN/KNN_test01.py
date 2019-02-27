@@ -16,7 +16,7 @@ import collections
         label
 '''
 def ReadDataSetCSV(file, label_dim, batch_dim, feature_dim):
-    csvdataset = np.loadtxt(file, dtype=str, comments='#', delimiter=',')
+    csvdataset = np.loadtxt(file, dtype = str, comments = '#', delimiter = ',')
     h_start, h_end = batch_dim[0], batch_dim[1]
     w_start, w_end = feature_dim[0], feature_dim[1]
     data = csvdataset[h_start:h_end, w_start:w_end].astype(np.float)
@@ -36,9 +36,9 @@ def ReadDataSetCSV(file, label_dim, batch_dim, feature_dim):
 '''
 def classify0(testcase, dataset, labels, k):
     # 计算欧式距离
-    distances = np.sum((testcase - dataset)**2, axis=1)**0.5
+    distances = np.sum((testcase - dataset) ** 2, axis = 1) ** 0.5
     # k个最近数据的index
-    k_w_index = np.argsort(distances, kind='quicksort')[0 : k]
+    k_w_index = np.argsort(distances, kind = 'quicksort')[0 : k]
     print(k_w_index)
     # k个最近的label
     k_labels = [labels[index] for index in k_w_index]

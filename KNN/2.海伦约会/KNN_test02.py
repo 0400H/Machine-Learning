@@ -6,15 +6,55 @@ import matplotlib.pyplot as plt
 import numpy as np
 import operator
 
+"""
+Function description:
+    打开并解析文件，对数据进行分类：1代表不喜欢,2代表魅力一般,3代表极具魅力
+Parameters:
+    filename - 文件名
+Returns:
+    returnMat - 特征矩阵
+    classLabelVector - 分类Label向量
+"""
+def file2matrix(filename, encode):
+    #打开文件,此次应指定编码，
+    fr = open(filename,'r',encoding = encode)
+    #读取文件所有内容
+    arrayOLines = fr.readlines()
+    #针对有BOM的UTF-8文本，应该去掉BOM，否则后面会引发错误。
+    arrayOLines[0]=arrayOLines[0].lstrip('\ufeff')
+    #得到文件行数
+    numberOfLines = len(arrayOLines)
+    #返回的NumPy矩阵, 解析完成的数据:number of lines行, 3列
+    returnMat = np.zeros((numberOfLines,3))
+    #返回的分类标签向量
+    classLabelVector = []
+    #行的索引值
+    index = 0
+    for line in arrayOLines:
+        #s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
+        line = line.strip()
+        #使用s.split(str="",num=string,cout(str))将字符串根据'\t'分隔符进行切片。
+        listFromLine = line.split('\t')
+        #将数据前三列提取出来,存放到returnMat的NumPy矩阵中,也就是特征矩阵
+        returnMat[index,:] = listFromLine[0:3]
+        #根据文本中标记的喜欢的程度进行分类,1代表不喜欢,2代表魅力一般,3代表极具魅力
+        if listFromLine[-1] == 'didntLike':
+            classLabelVector.append(1)
+        elif listFromLine[-1] == 'smallDoses':
+            classLabelVector.append(2)
+        elif listFromLine[-1] == 'largeDoses':
+            classLabelVector.append(3)
+        index += 1
+    return returnMat, classLabelVector
 
 """
 Function description:
-    kNN算法,分类器
+    kNN算法, 分类器
 Parameters:
-    inX - 用于分类的数据(测试集)
+    inX     - 用于分类的数据(测试集)
     dataSet - 用于训练的数据(训练集)
-    labes - 分类标签
-    k - kNN算法参数,选择距离最小的k个点
+    labes   - 分类标签
+    k       - kNN算法参数,选择距离最小的k个点
 Returns:
     sortedClassCount[0][0] - 分类结果
 """
@@ -46,48 +86,6 @@ def classify0(inX, dataSet, labels, k):
     print(sortedClassCount)
     #返回次数最多的类别,即所要分类的类别
     return sortedClassCount[0][0]
-
-
-"""
-Function description:
-    打开并解析文件，对数据进行分类：1代表不喜欢,2代表魅力一般,3代表极具魅力
-Parameters:
-    filename - 文件名
-Returns:
-    returnMat - 特征矩阵
-    classLabelVector - 分类Label向量
-"""
-def file2matrix(filename):
-    #打开文件,此次应指定编码，
-    fr = open(filename,'r',encoding = 'utf-8')
-    #读取文件所有内容
-    arrayOLines = fr.readlines()
-    #针对有BOM的UTF-8文本，应该去掉BOM，否则后面会引发错误。
-    arrayOLines[0]=arrayOLines[0].lstrip('\ufeff')
-    #得到文件行数
-    numberOfLines = len(arrayOLines)
-    #返回的NumPy矩阵, 解析完成的数据:number of lines行, 3列
-    returnMat = np.zeros((numberOfLines,3))
-    #返回的分类标签向量
-    classLabelVector = []
-    #行的索引值
-    index = 0
-    for line in arrayOLines:
-        #s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
-        line = line.strip()
-        #使用s.split(str="",num=string,cout(str))将字符串根据'\t'分隔符进行切片。
-        listFromLine = line.split('\t')
-        #将数据前三列提取出来,存放到returnMat的NumPy矩阵中,也就是特征矩阵
-        returnMat[index,:] = listFromLine[0:3]
-        #根据文本中标记的喜欢的程度进行分类,1代表不喜欢,2代表魅力一般,3代表极具魅力
-        if listFromLine[-1] == 'didntLike':
-            classLabelVector.append(1)
-        elif listFromLine[-1] == 'smallDoses':
-            classLabelVector.append(2)
-        elif listFromLine[-1] == 'largeDoses':
-            classLabelVector.append(3)
-        index += 1
-    return returnMat, classLabelVector
 
 """
 Function description:
@@ -202,7 +200,7 @@ def datingClassTest():
     #打开的文件名
     filename = "datingTestSet.txt"
     #将返回的特征矩阵和分类向量分别存储到datingDataMat和datingLabels中
-    datingDataMat, datingLabels = file2matrix(filename)
+    datingDataMat, datingLabels = file2matrix(filename, 'utf-8')
     #取所有数据的百分之十
     hoRatio = 0.10
     #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
@@ -244,7 +242,7 @@ def classifyPerson():
     #打开的文件名
     filename = "datingTestSet.txt"
     #打开并处理数据
-    datingDataMat, datingLabels = file2matrix(filename)
+    datingDataMat, datingLabels = file2matrix(filename, 'utf-8')
     #训练集归一化
     normMat, ranges, minVals = autoNorm(datingDataMat)
     #生成NumPy数组,测试集
