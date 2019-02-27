@@ -15,12 +15,12 @@ import collections
         data
         label
 '''
-def ReadDataSetCSV(file, w_label, batch, feature_dim):
+def ReadDataSetCSV(file, label_dim, batch_dim, feature_dim):
     csvdataset = np.loadtxt(file, dtype=str, comments='#', delimiter=',')
-    h_start, h_end = batch[0], batch[1]
+    h_start, h_end = batch_dim[0], batch_dim[1]
     w_start, w_end = feature_dim[0], feature_dim[1]
     data = csvdataset[h_start:h_end, w_start:w_end].astype(np.float)
-    labels = csvdataset[h_start:h_end, w_label]
+    labels = csvdataset[h_start:h_end, label_dim]
     print(data)
     return data, labels
 
