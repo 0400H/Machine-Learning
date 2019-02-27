@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+
 import numpy as np
 import collections
 # import operator
@@ -14,10 +15,12 @@ import collections
         data
         label
 '''
-def ReadDataSetCSV(file, start, end):
+def ReadDataSetCSV(file, w_label, batch, feature_dim):
     csvdataset = np.loadtxt(file, dtype=str, comments='#', delimiter=',')
-    data = csvdataset[start:end, 1:].astype(np.float)
-    labels = csvdataset[start:end, 0]
+    h_start, h_end = batch[0], batch[1]
+    w_start, w_end = feature_dim[0], feature_dim[1]
+    data = csvdataset[h_start:h_end, w_start:w_end].astype(np.float)
+    labels = csvdataset[h_start:h_end, w_label]
     print(data)
     return data, labels
 
@@ -35,17 +38,17 @@ def classify0(testcase, dataset, labels, k):
     # 计算欧式距离
     distances = np.sum((testcase - dataset)**2, axis=1)**0.5
     # k个最近数据的index
-    k_data_index = np.argsort(distances, kind='quicksort')[0 : k]
-    print(k_data_index)
+    k_w_index = np.argsort(distances, kind='quicksort')[0 : k]
+    print(k_w_index)
     # k个最近的label
-    k_labels = [labels[index] for index in k_data_index]
+    k_labels = [labels[index] for index in k_w_index]
     print(k_labels)
     # 出现次数最多的标签即为最终类别
     label = collections.Counter(k_labels).most_common(1)[0][0]
     return label
 
 if __name__ == '__main__':
-    date, labels = ReadDataSetCSV('knn.csv', 0, 6)
+    date, labels = ReadDataSetCSV('knn.csv', 0, [0, 6], [1, 3])
     #测试集
     case = [101, 20]
     #kNN分类
