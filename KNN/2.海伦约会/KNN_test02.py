@@ -1,51 +1,14 @@
 # -*- coding: UTF-8 -*-
 
+from sys import path
+path.append("../../")
+from Data2Matrix.data2matrix import file2matrix
+
 from matplotlib.font_manager import FontProperties
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import operator
-
-"""
-Function description:
-    打开并解析文件，对数据进行分类：1代表不喜欢,2代表魅力一般,3代表极具魅力
-Parameters:
-    filename - 文件名
-Returns:
-    returnMat - 特征矩阵
-    classLabelVector - 分类Label向量
-"""
-def file2matrix(filename, encode):
-    #打开文件,此次应指定编码，
-    fr = open(filename,'r',encoding = encode)
-    #读取文件所有内容
-    arrayOLines = fr.readlines()
-    #针对有BOM的UTF-8文本，应该去掉BOM，否则后面会引发错误。
-    arrayOLines[0]=arrayOLines[0].lstrip('\ufeff')
-    #得到文件行数
-    numberOfLines = len(arrayOLines)
-    #返回的NumPy矩阵, 解析完成的数据:number of lines行, 3列
-    returnMat = np.zeros((numberOfLines,3))
-    #返回的分类标签向量
-    classLabelVector = []
-    #行的索引值
-    index = 0
-    for line in arrayOLines:
-        #s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
-        line = line.strip()
-        #使用s.split(str="",num=string,cout(str))将字符串根据'\t'分隔符进行切片。
-        listFromLine = line.split('\t')
-        #将数据前三列提取出来,存放到returnMat的NumPy矩阵中,也就是特征矩阵
-        returnMat[index,:] = listFromLine[0:3]
-        #根据文本中标记的喜欢的程度进行分类,1代表不喜欢,2代表魅力一般,3代表极具魅力
-        if listFromLine[-1] == 'didntLike':
-            classLabelVector.append(1)
-        elif listFromLine[-1] == 'smallDoses':
-            classLabelVector.append(2)
-        elif listFromLine[-1] == 'largeDoses':
-            classLabelVector.append(3)
-        index += 1
-    return returnMat, classLabelVector
 
 """
 Function description:
@@ -58,7 +21,7 @@ Parameters:
 Returns:
     sortedClassCount[0][0] - 分类结果
 """
-def classify0(inX, dataSet, labels, k):
+def classify2(inX, dataSet, labels, k):
     #numpy函数shape[0]返回dataSet的行数
     dataSetSize = dataSet.shape[0]
     #在列向量方向上重复inX共1次(横向),行向量方向上重复inX共dataSetSize次(纵向)
@@ -214,7 +177,7 @@ def datingClassTest():
 
     for i in range(numTestVecs):
         #前numTestVecs个数据作为测试集,后m-numTestVecs个数据作为训练集
-        classifierResult = classify0(normMat[i,:], normMat[numTestVecs:m,:], 
+        classifierResult = classify2(normMat[i,:], normMat[numTestVecs:m,:], 
             datingLabels[numTestVecs:m], 4)
         print("分类结果:%s\t真实类别:%d" % (classifierResult, datingLabels[i]))
         if classifierResult != datingLabels[i]:
@@ -250,7 +213,7 @@ def classifyPerson():
     #测试集归一化
     norminArr = (inArr - minVals) / ranges
     #返回分类结果
-    classifierResult = classify0(norminArr, normMat, datingLabels, 3)
+    classifierResult = classify2(norminArr, normMat, datingLabels, 3)
     #打印结果
     print("你可能%s这个人" % (resultList[classifierResult-1]))
 
