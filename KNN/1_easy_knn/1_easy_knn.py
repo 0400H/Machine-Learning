@@ -2,11 +2,30 @@
 
 from sys import path
 path.append("../../")
-from Data2Matrix.data2matrix import ReadDataSet2Ndarray
+from DataTune.datatune import *
 
 import numpy as np
 import collections
 # import operator
+
+'''
+    Function description:
+        read data_ndarray fpom csv
+    Parameters:
+        filename
+        label_dim
+        batch_dim
+    Returns:
+        data
+        label
+'''
+def dataset2date_label(filename, nop, interval, batch_dim, feature_dim, label_dim) :
+    (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
+    data_ndarray = data2ndarray(filename, np.str, nop, interval)
+    data = get_ndarray_dim(data_ndarray, h_start, h_end, w_start, w_end, np.float)
+    labels = get_ndarray_dim(data_ndarray, h_start, h_end, label_dim, label_dim, np.str)
+
+    return data, labels
 
 '''
     函数说明:kNN算法,分类器
@@ -32,7 +51,7 @@ def classify1(testcase, dataset, labels, k):
     return label
 
 if __name__ == '__main__':
-    date, labels = ReadDataSet2Ndarray('knn.csv', (0, 6), (1, 3), 0)
+    date, labels = dataset2date_label('knn.csv', '#', ',', (0, 6), (1, 3), 0)
     #测试集
     case = [101, 20]
     #kNN分类

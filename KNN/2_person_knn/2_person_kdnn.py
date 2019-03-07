@@ -2,13 +2,35 @@
 
 from sys import path
 path.append("../../")
-from Data2Matrix.data2matrix import file2matrix
+from DataTune.datatune import *
+
+import numpy as np
+import operator
 
 from matplotlib.font_manager import FontProperties
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
-import numpy as np
-import operator
+
+"""
+Function description:
+    打开并解析文件，对数据进行分类：1代表不喜欢,2代表魅力一般,3代表极具魅力
+"""
+def file2data_label(filename, interval, encode) :
+    file_ndarray = file2ndarray(filename, interval, encode)
+    data_ndarray = file_ndarray[:, 0:-1].astype(np.float)
+    label_ndarray = file_ndarray[:, -1].astype(np.str)
+
+    labels_list = []
+    for label in label_ndarray:
+        #根据文本中标记的喜欢的程度进行分类,1代表不喜欢,2代表魅力一般,3代表极具魅力
+        if label == 'didntLike':
+            labels_list.append(1)
+        elif label == 'smallDoses':
+            labels_list.append(2)
+        elif label == 'largeDoses':
+            labels_list.append(3)
+
+    return data_ndarray, labels_list
 
 """
 Function description:
@@ -28,7 +50,7 @@ def classify2(inX, dataSet, labels, k):
     diffMat = np.tile(inX, (dataSetSize, 1)) - dataSet
     #二维特征相减后平方
     sqDiffMat = diffMat**2
-    #sum()所有元素相加,sum(0)列相加,sum(1)行相加
+    #sum()所有元素相加,axis==0列相加,axis==1行相加
     sqDistances = sqDiffMat.sum(axis=1)
     #开方,计算出距离
     distances = sqDistances**0.5
@@ -39,9 +61,8 @@ def classify2(inX, dataSet, labels, k):
     for i in range(k):
         #取出前k个元素的类别
         voteIlabel = labels[sortedDistIndices[i]]
-        #dict.get(key,default=None),字典的get()方法,返回指定键的值,如果值不在字典中返回默认值。
-        #计算类别次数
-        classCount[voteIlabel] = classCount.get(voteIlabel,0) + 1
+        #计算类别次数， dict.get(key,default=None),字典的get()方法,返回指定键的值,如果值不在字典中返回默认值。
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
     #key=operator.itemgetter(1)根据字典的值进行排序
     #key=operator.itemgetter(0)根据字典的键进行排序
     #reverse降序排序字典
@@ -118,52 +139,39 @@ def showdatas(datingDataMat, datingLabels):
     #显示图片
     plt.show()
 
-
 """
-Function description:对数据进行归一化
-
-Parameters:
-    dataSet - 特征矩阵
-Returns:
-    normDataSet - 归一化后的特征矩阵
-    ranges - 数据范围
-    minVals - 数据最小值
-
-Modify:
-    2017-03-24
+Function description:通过输入一个人的三维特征,进行分类输出
 """
-def autoNorm(dataSet):
-    #获得数据的最小值
-    minVals = dataSet.min(0)
-    maxVals = dataSet.max(0)
-    #最大值和最小值的范围
-    ranges = maxVals - minVals
-    #shape(dataSet)返回dataSet的矩阵行列数
-    normDataSet = np.zeros(np.shape(dataSet))
-    #返回dataSet的行数
-    m = dataSet.shape[0]
-    #原始值减去最小值
-    normDataSet = dataSet - np.tile(minVals, (m, 1))
-    #除以最大和最小值的差,得到归一化数据
-    normDataSet = normDataSet / np.tile(ranges, (m, 1))
-    #返回归一化数据结果,数据范围,最小值
-    return normDataSet, ranges, minVals
-
+def classifyPerson():
+    #输出结果
+    resultList = ['讨厌','有些喜欢','非常喜欢']
+    #三维特征用户输入
+    precentTats = float(input("玩视频游戏所耗时间百分比:"))
+    ffMiles = float(input("每年获得的飞行常客里程数:"))
+    iceCream = float(input("每周消费的冰激淋公升数:"))
+    #打开的文件名
+    filename = "datingTestSet.txt"
+    #打开并处理数据
+    datingDataMat, datingLabels = file2data_label(filename, 'utf-8')
+    #训练集归一化
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    #生成NumPy数组,测试集
+    inArr = np.array([ffMiles, precentTats, iceCream])
+    #测试集归一化
+    norminArr = (inArr - minVals) / ranges
+    #返回分类结果
+    classifierResult = classify2(norminArr, normMat, datingLabels, 2)
+    #打印结果
+    print("你可能%s这个人" % (resultList[classifierResult-1]))
 
 """
 Function description:分类器测试函数
-Parameters:
-    无
-Returns:
-    normDataSet - 归一化后的特征矩阵
-    ranges - 数据范围
-    minVals - 数据最小值
 """
 def datingClassTest():
     #打开的文件名
-    filename = "datingTestSet.txt"
+    filename = "datingTestSet.csv"
     #将返回的特征矩阵和分类向量分别存储到datingDataMat和datingLabels中
-    datingDataMat, datingLabels = file2matrix(filename, 'utf-8')
+    datingDataMat, datingLabels = file2data_label(filename, '\t', 'utf-8')
     #取所有数据的百分之十
     hoRatio = 0.10
     #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
@@ -184,49 +192,5 @@ def datingClassTest():
             errorCount += 1.0
     print("错误率:%f%%" %(errorCount/float(numTestVecs)*100))
 
-"""
-Function description:通过输入一个人的三维特征,进行分类输出
-
-Parameters:
-    无
-Returns:
-    无
-
-Modify:
-    2017-03-24
-"""
-def classifyPerson():
-    #输出结果
-    resultList = ['讨厌','有些喜欢','非常喜欢']
-    #三维特征用户输入
-    precentTats = float(input("玩视频游戏所耗时间百分比:"))
-    ffMiles = float(input("每年获得的飞行常客里程数:"))
-    iceCream = float(input("每周消费的冰激淋公升数:"))
-    #打开的文件名
-    filename = "datingTestSet.txt"
-    #打开并处理数据
-    datingDataMat, datingLabels = file2matrix(filename, 'utf-8')
-    #训练集归一化
-    normMat, ranges, minVals = autoNorm(datingDataMat)
-    #生成NumPy数组,测试集
-    inArr = np.array([ffMiles, precentTats, iceCream])
-    #测试集归一化
-    norminArr = (inArr - minVals) / ranges
-    #返回分类结果
-    classifierResult = classify2(norminArr, normMat, datingLabels, 3)
-    #打印结果
-    print("你可能%s这个人" % (resultList[classifierResult-1]))
-
-"""
-Function description:main函数
-
-Parameters:
-    无
-Returns:
-    无
-
-Modify:
-    2017-03-24
-"""
 if __name__ == '__main__':
     datingClassTest()
