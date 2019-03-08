@@ -12,17 +12,17 @@ Function description:
     打开并解析文件，对数据进行分类：1:didntLike,2:smallDoses,3:largeDoses
 """
 def file2data_label(filename, interval, encode) :
-    file_ndarray = file2ndarray(filename, interval, encode)
-    data_ndarray = file_ndarray[:, 0:-1].astype(np.float)
-    label_ndarray = file_ndarray[:, -1].astype(np.str)
+    file_array = file2array(filename, interval, encode)
+    data_array = file_array[:, 0:-1].astype(np.float)
+    label_array = file_array[:, -1].astype(np.str)
 
     labels_dict = {'didntLike': 1, 'smallDoses':2, 'largeDoses':3}
     labels_list = []
 
-    for label in label_ndarray:
+    for label in label_array:
         labels_list.append(labels_dict[label])
 
-    return data_ndarray, labels_list
+    return data_array, labels_list
 
 """
 Function description:
@@ -65,9 +65,9 @@ def classify_love(inX, dataSet, labels, K):
 Function description:使用数据集进行分类器验证
 """
 def classify_verification(filename, ratio, K):
-    data_ndarray, label_ndarray = file2data_label(filename, '\t', 'utf-8')
+    data_array, label_array = file2data_label(filename, '\t', 'utf-8')
     #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
-    normMat, ranges, minVals = autoNorm(data_ndarray)
+    normMat, ranges, minVals = autoNorm(data_array)
     #获得normMat的行数
     num_of_row = normMat.shape[0]
     #百分之十的测试数据的个数
@@ -79,11 +79,11 @@ def classify_verification(filename, ratio, K):
     for i in range(num_of_testcase):
         #前num_of_testcase个数据作为测试集,后num_of_testcase个数据作为训练集
         classifierResult = classify_love(normMat[i,:], normMat[num_of_testcase:num_of_row,:], 
-                                        label_ndarray[num_of_testcase:num_of_row], K)
-        print("correction: %s, prediction: %s, reality: %s" % (classifierResult == label_ndarray[i],
+                                        label_array[num_of_testcase:num_of_row], K)
+        print("correction: %s, prediction: %s, reality: %s" % (classifierResult == label_array[i],
                                                                labels_dict[classifierResult],
-                                                               labels_dict[label_ndarray[i]]))
-        if classifierResult != label_ndarray[i]:
+                                                               labels_dict[label_array[i]]))
+        if classifierResult != label_array[i]:
             errorCount += 1.0
     print("错误率:%f%%" %(errorCount/float(num_of_testcase)*100))
 
@@ -92,28 +92,28 @@ Function description:使用数据集进行分类器测试
 """
 def classify_test(filename, K):
     #打开并处理数据
-    data_ndarray, label_ndarray = file2data_label(filename, '\t', 'utf-8')
+    data_array, label_array = file2data_label(filename, '\t', 'utf-8')
     #训练集归一化
-    normMat, ranges, minVals = autoNorm(data_ndarray)
+    normMat, ranges, minVals = autoNorm(data_array)
 
     #定义输出结果
     resultList = ['didntLike','smallDoses','largeDoses']
 
     #三维特征用户输入
-    precentTats = float(input("hobby1 ratio a year:"))
-    ffMiles = float(input("hobby2 ratio a year:"))
-    iceCream = float(input("hobby3 ratio a year:"))
+    precentTats = float(input("hobby1 time a year:"))
+    ffMiles = float(input("hobby2 time a year:"))
+    iceCream = float(input("hobby3 time a year:"))
     #生成NumPy数组,测试集
     inArr = np.array([ffMiles, precentTats, iceCream])
     #测试集归一化
     norminArr = (inArr - minVals) / ranges
     #返回分类结果
-    classifierResult = classify_love(norminArr, normMat, label_ndarray, K)
+    classifierResult = classify_love(norminArr, normMat, label_array, K)
     #打印结果
     print("prediction: %s" % (resultList[classifierResult-1]))
 
 
-def showdatas(data_ndarray, label_ndarray) :
+def showdatas(data_array, label_array) :
     # fontfile = r"c:\windows\fonts\simsun.ttc"
     fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
 
@@ -121,28 +121,28 @@ def showdatas(data_ndarray, label_ndarray) :
     canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13,8))
 
     LabelsColorsDict = {1:'black', 2:'orange', 3:'red'}
-    LabelsColors = [LabelsColorsDict[i] for i in label_ndarray]
+    LabelsColors = [LabelsColorsDict[i] for i in label_array]
 
-    #画出散点图,以data_ndarray矩阵的第一(hobby2)、第二列(hobby1)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[0][0], '00', data_ndarray[:,0], data_ndarray[:,1],
+    #画出散点图,以data_array矩阵的第一(hobby2)、第二列(hobby1)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[0][0], '00', data_array[:,0], data_array[:,1],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby2 / hobby1 ratio', 9, 'bold', 'red',
-             u'hobby2 time ratio a year', 7, 'bold', 'black', 
-             u'hobby1 time ratio a year', 7, 'bold', 'black')
+             u'hobby2 / hobby1', 9, 'bold', 'red',
+             u'hobby2 time a year', 7, 'bold', 'black', 
+             u'hobby1 time a year', 7, 'bold', 'black')
 
-    #画出散点图,以data_ndarray矩阵的第一(hobby2)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[0][1], '01', data_ndarray[:,0], data_ndarray[:,2],
+    #画出散点图,以data_array矩阵的第一(hobby2)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[0][1], '01', data_array[:,0], data_array[:,2],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby2 / hobby3 ratio', 9, 'bold', 'red',
-             u'hobby2 time ratio a year', 7, 'bold', 'black', 
-             u'hobby3 time ratio a year', 7, 'bold', 'black')
+             u'hobby2 / hobby3', 9, 'bold', 'red',
+             u'hobby2 time a year', 7, 'bold', 'black', 
+             u'hobby3 time a year', 7, 'bold', 'black')
 
-    #画出散点图,以data_ndarray矩阵的第二(hobby1)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[1][0], '10', data_ndarray[:,1], data_ndarray[:,2],
+    #画出散点图,以data_array矩阵的第二(hobby1)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[1][0], '10', data_array[:,1], data_array[:,2],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby1 / hobby3 ratio', 9, 'bold', 'red',
-             u'hobby1 time ratio a year', 7, 'bold', 'black', 
-             u'hobby3 time ratio a year', 7, 'bold', 'black')
+             u'hobby1 / hobby3', 9, 'bold', 'red',
+             u'hobby1 time a year', 7, 'bold', 'black', 
+             u'hobby3 time a year', 7, 'bold', 'black')
 
     #设置图例
     didntLike = get_marker_Line2D('black', 6, 'didntLike')
@@ -159,7 +159,7 @@ def showdatas(data_ndarray, label_ndarray) :
 
 if __name__ == '__main__':
     datasetcsv = "datingTestSet.csv"
-    data_ndarray, label_ndarray = file2data_label(datasetcsv, '\t', 'utf-8')
-    showdatas(data_ndarray, label_ndarray)
+    data_array, label_array = file2data_label(datasetcsv, '\t', 'utf-8')
+    showdatas(data_array, label_array)
     classify_verification(datasetcsv, 0.1, 20)
     classify_test(datasetcsv, 20)
