@@ -7,28 +7,20 @@ from DataTune.datatune import *
 import numpy as np
 import operator
 
-from matplotlib.font_manager import FontProperties
-import matplotlib.lines as mlines
-import matplotlib.pyplot as plt
-
 """
 Function description:
-    打开并解析文件，对数据进行分类：1代表不喜欢,2代表魅力一般,3代表极具魅力
+    打开并解析文件，对数据进行分类：1:didntLike,2:smallDoses,3:largeDoses
 """
 def file2data_label(filename, interval, encode) :
     file_ndarray = file2ndarray(filename, interval, encode)
     data_ndarray = file_ndarray[:, 0:-1].astype(np.float)
     label_ndarray = file_ndarray[:, -1].astype(np.str)
 
+    labels_dict = {'didntLike': 1, 'smallDoses':2, 'largeDoses':3}
     labels_list = []
+
     for label in label_ndarray:
-        #根据文本中标记的喜欢的程度进行分类,1代表不喜欢,2代表魅力一般,3代表极具魅力
-        if label == 'didntLike':
-            labels_list.append(1)
-        elif label == 'smallDoses':
-            labels_list.append(2)
-        elif label == 'largeDoses':
-            labels_list.append(3)
+        labels_list.append(labels_dict[label])
 
     return data_ndarray, labels_list
 
@@ -43,7 +35,7 @@ Parameters:
 Returns:
     sortedClassCount[0][0] - 分类结果
 """
-def classify2(inX, dataSet, labels, k):
+def classify_love(inX, dataSet, labels, K):
     #numpy函数shape[0]返回dataSet的行数
     dataSetSize = dataSet.shape[0]
     #在列向量方向上重复inX共1次(横向),行向量方向上重复inX共dataSetSize次(纵向)
@@ -58,139 +50,116 @@ def classify2(inX, dataSet, labels, k):
     sortedDistIndices = distances.argsort()
     #定一个记录类别次数的字典
     classCount = {}
-    for i in range(k):
+    for i in range(K):
         #取出前k个元素的类别
         voteIlabel = labels[sortedDistIndices[i]]
         #计算类别次数， dict.get(key,default=None),字典的get()方法,返回指定键的值,如果值不在字典中返回默认值。
         classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
-    #key=operator.itemgetter(1)根据字典的值进行排序
-    #key=operator.itemgetter(0)根据字典的键进行排序
-    #reverse降序排序字典
-    sortedClassCount = sorted(classCount.items(),key=operator.itemgetter(1),reverse=True)
-    print(sortedClassCount)
+    #reverse==True降序排序字典
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+    # print('label,times:', sortedClassCount)
     #返回次数最多的类别,即所要分类的类别
     return sortedClassCount[0][0]
 
 """
-Function description:
-    可视化数据
-Parameters:
-    datingDataMat - 特征矩阵
-    datingLabels  - 分类Label
-Returns:
-    none
+Function description:使用数据集进行分类器验证
 """
-def showdatas(datingDataMat, datingLabels):
-    #设置汉字格式
-    font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
-    #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
-    #当nrow=2,nclos=2时,代表fig画布被分为四个区域,axs[0][0]表示第一行第一个区域
-    fig, axs = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13,8))
+def classify_verification(filename, ratio, K):
+    data_ndarray, label_ndarray = file2data_label(filename, '\t', 'utf-8')
+    #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
+    normMat, ranges, minVals = autoNorm(data_ndarray)
+    #获得normMat的行数
+    num_of_row = normMat.shape[0]
+    #百分之十的测试数据的个数
+    num_of_testcase = int(num_of_row * ratio)
+    #分类错误计数
+    errorCount = 0.0
 
-    numberOfLabels = len(datingLabels)
-    LabelsColors = []
-    for i in datingLabels:
-        if i == 1:
-            LabelsColors.append('black')
-        if i == 2:
-            LabelsColors.append('orange')
-        if i == 3:
-            LabelsColors.append('red')
-    #画出散点图,以datingDataMat矩阵的第一(飞行常客例程)、第二列(玩游戏)数据画散点数据,散点大小为15,透明度为0.5
-    axs[0][0].scatter(x=datingDataMat[:,0], y=datingDataMat[:,1], color=LabelsColors,s=15, alpha=.5)
-    #设置标题,x轴label,y轴label
-    axs0_title_text = axs[0][0].set_title(u'每年获得的飞行常客里程数与玩视频游戏所消耗时间占比',FontProperties=font)
-    axs0_xlabel_text = axs[0][0].set_xlabel(u'每年获得的飞行常客里程数',FontProperties=font)
-    axs0_ylabel_text = axs[0][0].set_ylabel(u'玩视频游戏所消耗时间占比',FontProperties=font)
-    plt.setp(axs0_title_text, size=9, weight='bold', color='red')  
-    plt.setp(axs0_xlabel_text, size=7, weight='bold', color='black')  
-    plt.setp(axs0_ylabel_text, size=7, weight='bold', color='black') 
-
-    #画出散点图,以datingDataMat矩阵的第一(飞行常客例程)、第三列(冰激凌)数据画散点数据,散点大小为15,透明度为0.5
-    axs[0][1].scatter(x=datingDataMat[:,0], y=datingDataMat[:,2], color=LabelsColors,s=15, alpha=.5)
-    #设置标题,x轴label,y轴label
-    axs1_title_text = axs[0][1].set_title(u'每年获得的飞行常客里程数与每周消费的冰激淋公升数',FontProperties=font)
-    axs1_xlabel_text = axs[0][1].set_xlabel(u'每年获得的飞行常客里程数',FontProperties=font)
-    axs1_ylabel_text = axs[0][1].set_ylabel(u'每周消费的冰激淋公升数',FontProperties=font)
-    plt.setp(axs1_title_text, size=9, weight='bold', color='red')  
-    plt.setp(axs1_xlabel_text, size=7, weight='bold', color='black')  
-    plt.setp(axs1_ylabel_text, size=7, weight='bold', color='black') 
-
-    #画出散点图,以datingDataMat矩阵的第二(玩游戏)、第三列(冰激凌)数据画散点数据,散点大小为15,透明度为0.5
-    axs[1][0].scatter(x=datingDataMat[:,1], y=datingDataMat[:,2], color=LabelsColors,s=15, alpha=.5)
-    #设置标题,x轴label,y轴label
-    axs2_title_text = axs[1][0].set_title(u'玩视频游戏所消耗时间占比与每周消费的冰激淋公升数',FontProperties=font)
-    axs2_xlabel_text = axs[1][0].set_xlabel(u'玩视频游戏所消耗时间占比',FontProperties=font)
-    axs2_ylabel_text = axs[1][0].set_ylabel(u'每周消费的冰激淋公升数',FontProperties=font)
-    plt.setp(axs2_title_text, size=9, weight='bold', color='red')  
-    plt.setp(axs2_xlabel_text, size=7, weight='bold', color='black')  
-    plt.setp(axs2_ylabel_text, size=7, weight='bold', color='black') 
-    #设置图例
-    didntLike = mlines.Line2D([], [], color='black', marker='.',
-                      markersize=6, label='didntLike')
-    smallDoses = mlines.Line2D([], [], color='orange', marker='.',
-                      markersize=6, label='smallDoses')
-    largeDoses = mlines.Line2D([], [], color='red', marker='.',
-                      markersize=6, label='largeDoses')
-    #添加图例
-    axs[0][0].legend(handles=[didntLike,smallDoses,largeDoses])
-    axs[0][1].legend(handles=[didntLike,smallDoses,largeDoses])
-    axs[1][0].legend(handles=[didntLike,smallDoses,largeDoses])
-    #显示图片
-    plt.show()
+    labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
+    for i in range(num_of_testcase):
+        #前num_of_testcase个数据作为测试集,后num_of_testcase个数据作为训练集
+        classifierResult = classify_love(normMat[i,:], normMat[num_of_testcase:num_of_row,:], 
+                                        label_ndarray[num_of_testcase:num_of_row], K)
+        print("correction: %s, prediction: %s, reality: %s" % (classifierResult == label_ndarray[i],
+                                                               labels_dict[classifierResult],
+                                                               labels_dict[label_ndarray[i]]))
+        if classifierResult != label_ndarray[i]:
+            errorCount += 1.0
+    print("错误率:%f%%" %(errorCount/float(num_of_testcase)*100))
 
 """
-Function description:通过输入一个人的三维特征,进行分类输出
+Function description:使用数据集进行分类器测试
 """
-def classifyPerson():
-    #输出结果
-    resultList = ['讨厌','有些喜欢','非常喜欢']
-    #三维特征用户输入
-    precentTats = float(input("玩视频游戏所耗时间百分比:"))
-    ffMiles = float(input("每年获得的飞行常客里程数:"))
-    iceCream = float(input("每周消费的冰激淋公升数:"))
-    #打开的文件名
-    filename = "datingTestSet.txt"
+def classify_test(filename, K):
     #打开并处理数据
-    datingDataMat, datingLabels = file2data_label(filename, 'utf-8')
+    data_ndarray, label_ndarray = file2data_label(filename, '\t', 'utf-8')
     #训练集归一化
-    normMat, ranges, minVals = autoNorm(datingDataMat)
+    normMat, ranges, minVals = autoNorm(data_ndarray)
+
+    #定义输出结果
+    resultList = ['didntLike','smallDoses','largeDoses']
+
+    #三维特征用户输入
+    precentTats = float(input("hobby1 ratio a year:"))
+    ffMiles = float(input("hobby2 ratio a year:"))
+    iceCream = float(input("hobby3 ratio a year:"))
     #生成NumPy数组,测试集
     inArr = np.array([ffMiles, precentTats, iceCream])
     #测试集归一化
     norminArr = (inArr - minVals) / ranges
     #返回分类结果
-    classifierResult = classify2(norminArr, normMat, datingLabels, 2)
+    classifierResult = classify_love(norminArr, normMat, label_ndarray, K)
     #打印结果
-    print("你可能%s这个人" % (resultList[classifierResult-1]))
+    print("prediction: %s" % (resultList[classifierResult-1]))
 
-"""
-Function description:分类器测试函数
-"""
-def datingClassTest():
-    #打开的文件名
-    filename = "datingTestSet.csv"
-    #将返回的特征矩阵和分类向量分别存储到datingDataMat和datingLabels中
-    datingDataMat, datingLabels = file2data_label(filename, '\t', 'utf-8')
-    #取所有数据的百分之十
-    hoRatio = 0.10
-    #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
-    normMat, ranges, minVals = autoNorm(datingDataMat)
-    #获得normMat的行数
-    m = normMat.shape[0]
-    #百分之十的测试数据的个数
-    numTestVecs = int(m * hoRatio)
-    #分类错误计数
-    errorCount = 0.0
 
-    for i in range(numTestVecs):
-        #前numTestVecs个数据作为测试集,后m-numTestVecs个数据作为训练集
-        classifierResult = classify2(normMat[i,:], normMat[numTestVecs:m,:], 
-            datingLabels[numTestVecs:m], 4)
-        print("分类结果:%s\t真实类别:%d" % (classifierResult, datingLabels[i]))
-        if classifierResult != datingLabels[i]:
-            errorCount += 1.0
-    print("错误率:%f%%" %(errorCount/float(numTestVecs)*100))
+def showdatas(data_ndarray, label_ndarray) :
+    # fontfile = r"c:\windows\fonts\simsun.ttc"
+    fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+
+    #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
+    canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13,8))
+
+    LabelsColorsDict = {1:'black', 2:'orange', 3:'red'}
+    LabelsColors = [LabelsColorsDict[i] for i in label_ndarray]
+
+    #画出散点图,以data_ndarray矩阵的第一(hobby2)、第二列(hobby1)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[0][0], '00', data_ndarray[:,0], data_ndarray[:,1],
+             fontfile, True, LabelsColors, 15, 0.5,
+             u'hobby2 / hobby1 ratio', 9, 'bold', 'red',
+             u'hobby2 time ratio a year', 7, 'bold', 'black', 
+             u'hobby1 time ratio a year', 7, 'bold', 'black')
+
+    #画出散点图,以data_ndarray矩阵的第一(hobby2)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[0][1], '01', data_ndarray[:,0], data_ndarray[:,2],
+             fontfile, True, LabelsColors, 15, 0.5,
+             u'hobby2 / hobby3 ratio', 9, 'bold', 'red',
+             u'hobby2 time ratio a year', 7, 'bold', 'black', 
+             u'hobby3 time ratio a year', 7, 'bold', 'black')
+
+    #画出散点图,以data_ndarray矩阵的第二(hobby1)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
+    data2plt(figure[1][0], '10', data_ndarray[:,1], data_ndarray[:,2],
+             fontfile, True, LabelsColors, 15, 0.5,
+             u'hobby1 / hobby3 ratio', 9, 'bold', 'red',
+             u'hobby1 time ratio a year', 7, 'bold', 'black', 
+             u'hobby3 time ratio a year', 7, 'bold', 'black')
+
+    #设置图例
+    didntLike = get_marker_Line2D('black', 6, 'didntLike')
+    smallDoses = get_marker_Line2D('orange', 6, 'smallDoses')
+    largeDoses = get_marker_Line2D('red', 6, 'largeDoses')
+    #添加图例
+    handle = [didntLike, smallDoses, largeDoses]
+    add_legend(figure[0][0], handle)
+    add_legend(figure[0][1], handle)
+    add_legend(figure[1][0], handle)
+
+    #显示图片
+    show_pyplot(plt)
 
 if __name__ == '__main__':
-    datingClassTest()
+    datasetcsv = "datingTestSet.csv"
+    data_ndarray, label_ndarray = file2data_label(datasetcsv, '\t', 'utf-8')
+    showdatas(data_ndarray, label_ndarray)
+    classify_verification(datasetcsv, 0.1, 20)
+    classify_test(datasetcsv, 20)
