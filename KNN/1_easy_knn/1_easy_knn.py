@@ -6,7 +6,6 @@ __Father_Root__ = os.path.dirname(__file__) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
 path.append(__Project_Root__)
 
-print(__Father_Root__)
 from DataTune.datatune import *
 
 import numpy as np
@@ -24,11 +23,11 @@ import collections
         data
         label
 '''
-def dataset2date_label(filename, nop, interval, batch_dim, feature_dim, label_dim) :
+def dataset2dateandlabel(filename, nop, interval, batch_dim, feature_dim, label_dim) :
     (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
-    data_array = data2array(filename, np.str, nop, interval)
-    data = get_array_dim(data_array, h_start, h_end, w_start, w_end, np.float)
-    labels = get_array_dim(data_array, h_start, h_end, label_dim, label_dim, np.str)
+    data_array = file2array1(filename, np.str, nop, interval)
+    data = data2matrix(data_array, h_start, h_end, w_start, w_end, np.float)
+    labels = data2col(data_array, h_start, h_end, label_dim, label_dim+1, np.str)
 
     return data, labels
 
@@ -55,7 +54,8 @@ def classify_easy_knn(testcase, dataset, labels, k):
     return label
 
 if __name__ == '__main__':
-    date, labels = dataset2date_label(__Father_Root__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
+    date, labels = dataset2dateandlabel(__Father_Root__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
+    labels = np.ndarray.tolist(labels)
     #测试集
     testcase = [(20, 90), (50, 60), (80, 10)]
     #kNN分类

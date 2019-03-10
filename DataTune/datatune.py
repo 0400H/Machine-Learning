@@ -9,38 +9,59 @@ import matplotlib.pyplot as plt
 Function description: 从文件读取数据到array
 """
 
-def data2array(filename, in_dtype, nop, interval) :
-    return np.loadtxt(filename, dtype=in_dtype, comments=nop, delimiter=interval)
+def file2array1(filename, in_dtype, nop='#', interval='') :
+    if (interval == '') :
+        return np.loadtxt(filename, dtype=in_dtype, comments=nop)
+    else :
+        return np.loadtxt(filename, dtype=in_dtype, comments=nop, delimiter=interval)
 
-def file2array(filename, interval, encode) :
+def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
     file2list = open(filename, 'r', encoding = encode).readlines()
     #针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
     file2list[0] = file2list[0].lstrip('\ufeff')
     #得到文件行数,列数, 创建合适的 NumPy 矩阵
     num_of_row = len(file2list)
-    num_of_column = file2list[0].count(interval) + 1
-    data_array = np.zeros((num_of_row, num_of_column)).astype(np.str) 
+    num_of_column = len(file2list[0]) if interval == '' else file2list[0].count(interval) + 1
+    data_array = np.zeros((num_of_row, num_of_column)).astype(out_dtype)
 
     index = 0
     for line in file2list :
         #s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
-        line2list = line.strip().split(interval)
-        data_array[index,:] = line2list
+        line2list = line.strip() if interval == '' else line.strip().split(interval)
+        data_array[index] = np.array(line2list)
         index += 1
 
-    return data_array
-
-def get_array_dim(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str) :
-    if h_end <= h_start + 1 and w_end <= w_start + 1:
-        data_array = data_array[h_start, w_start]
-    elif h_end > h_start + 1 and w_end <= w_start + 1:
-        data_array = data_array[h_start:h_end, w_start]
-    elif h_end <= h_start + 1 and w_end > w_start + 1:
-        data_array = data_array[h_start, w_start:w_end]
-    elif h_end > h_start + 1 and w_end > w_start + 1:
-        data_array = data_array[h_start:h_end, w_start:w_end]
-
     return data_array.astype(out_dtype)
+
+def str2col(string, out_dtype = np.int) :
+    length = len(string.strip())
+    str_col = np.zeros(shape=(length)).astype(out_dtype)
+    for index in range(length) :
+        str_col[index] = np.array(string[index])
+    return str_col.astype(out_dtype).reshape(1, length)
+
+def data2matrix(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str) :
+    return data_array[h_start:h_end, w_start:w_end].astype(out_dtype)
+
+def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_row=True) :
+    data_array_by_dim = data_array[h_start:h_end, w_start:w_end]
+    if out_row == True :
+        data_array_by_dim.flatten().astype(out_dtype)
+    else :
+        data_array_by_dim.flatten('F').astype(out_dtype)
+    return data_array_by_dim
+
+def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
+    # 创建1x1024零向量
+    h_length = h_end - h_start
+    w_length = w_end - w_start
+    img_col = np.zeros((h_length, w_length))
+    fp_data = open(filename, 'r', encoding = encode).readlines()
+    for h_index in range(h_start, h_end) :
+        line_string = (fp_data[h_index])[w_start:w_end]
+        img_col[h_index - h_start] = str2col(line_string, out_dtype)
+
+    return img_col.reshape(1, h_length * w_length)
 
 """
 Function description:对数据进行归一化

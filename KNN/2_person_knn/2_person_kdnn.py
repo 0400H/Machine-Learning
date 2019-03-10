@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-#%%
+
 import os
 from sys import path
 __Father_Root__ = os.path.dirname(__file__) + '/'
@@ -15,7 +15,7 @@ import operator
 Function description: 打开并解析文件，对数据进行分类：1:didntLike, 2:smallDoses, 3:largeDoses
 """
 def file2data_label(filename, interval, encode) :
-    file_array = file2array(filename, interval, encode)
+    file_array = file2array2(filename, np.str, interval, encode)
     data_array = file_array[:, 0:-1].astype(np.float)
     label_array = file_array[:, -1].astype(np.str)
 
@@ -25,8 +25,7 @@ def file2data_label(filename, interval, encode) :
     return data_array, labels_list
 
 """
-Function description:
-    kNN算法, 分类器
+Function description: kNN算法, 分类器
 Parameters:
     inX     - 用于分类的数据(测试集)
     dataSet - 用于训练的数据(训练集)
@@ -53,14 +52,14 @@ def classify_love(inX, dataSet, labels, K):
         voteIlabel = labels[sortedDistIndices[i]]
         #计算类别次数， dict.get(key,default=None),字典的get()方法,返回指定键的值,如果值不在字典中返回默认值。
         classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
-    #reverse==True降序排序字典
+    #reverse==True降序排序字典, itemgetter(0) 与 itemgetter(1)分别根据字典的键和值进行排序
     sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
     # print('label,times:', sortedClassCount)
     #返回次数最多的类别,即所要分类的类别
     return sortedClassCount[0][0]
 
 """
-Function description:使用数据集进行分类器验证
+Function description: 使用数据集进行分类器验证
 """
 def classify_verification(filename, ratio, K):
     data_array, label_array = file2data_label(filename, '\t', 'utf-8')
@@ -117,7 +116,7 @@ def showdatas(data_array, label_array) :
     fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
 
     #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
-    canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13,8))
+    canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13, 8))
 
     LabelsColorsDict = {1:'black', 2:'orange', 3:'red'}
     LabelsColors = [LabelsColorsDict[i] for i in label_array]
