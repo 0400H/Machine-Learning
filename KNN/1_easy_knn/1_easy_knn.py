@@ -2,7 +2,7 @@
 
 import os
 from sys import path
-__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+__Father_Root__ = os.path.dirname(__file__) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
 path.append(__Project_Root__)
 

@@ -1,7 +1,12 @@
 # -*- coding: UTF-8 -*-
+import os
+from sys import path
+__Father_Root__ = os.path.dirname(__file__) + '/'
+__Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
+path.append(__Project_Root__)
+
 import numpy as np
 import operator
-from os import listdir
 from sklearn.neighbors import KNeighborsClassifier as kNN
 
 """
@@ -45,7 +50,7 @@ def handwritingClassTest():
 	#测试集的Labels
 	hwLabels = []
 	#返回trainingDigits目录下的文件名
-	trainingFileList = listdir('trainingDigits')
+	trainingFileList = os.listdir('trainingDigits')
 	#返回文件夹下文件的个数
 	m = len(trainingFileList)
 	#初始化训练的Mat矩阵,测试集
@@ -65,7 +70,7 @@ def handwritingClassTest():
 	#拟合模型, trainingMat为训练矩阵,hwLabels为对应的标签
 	neigh.fit(trainingMat, hwLabels)
 	#返回testDigits目录下的文件列表
-	testFileList = listdir('testDigits')
+	testFileList = os.listdir('testDigits')
 	#错误检测计数
 	errorCount = 0.0
 	#测试数据的数量
