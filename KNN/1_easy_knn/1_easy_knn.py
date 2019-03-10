@@ -1,7 +1,12 @@
 # -*- coding: UTF-8 -*-
 
+import os
 from sys import path
-path.append("../../")
+__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+__Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
+path.append(__Project_Root__)
+
+print(__Father_Root__)
 from DataTune.datatune import *
 
 import numpy as np
@@ -10,7 +15,7 @@ import collections
 
 '''
     Function description:
-        read data_ndarray fpom csv
+        read data_array fpom csv
     Parameters:
         filename
         label_dim
@@ -21,9 +26,9 @@ import collections
 '''
 def dataset2date_label(filename, nop, interval, batch_dim, feature_dim, label_dim) :
     (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
-    data_ndarray = data2ndarray(filename, np.str, nop, interval)
-    data = get_ndarray_dim(data_ndarray, h_start, h_end, w_start, w_end, np.float)
-    labels = get_ndarray_dim(data_ndarray, h_start, h_end, label_dim, label_dim, np.str)
+    data_array = data2array(filename, np.str, nop, interval)
+    data = get_array_dim(data_array, h_start, h_end, w_start, w_end, np.float)
+    labels = get_array_dim(data_array, h_start, h_end, label_dim, label_dim, np.str)
 
     return data, labels
 
@@ -51,7 +56,7 @@ def classify1(testcase, dataset, labels, k):
     return label
 
 if __name__ == '__main__':
-    date, labels = dataset2date_label('knn.csv', '#', ',', (0, 6), (1, 3), 0)
+    date, labels = dataset2date_label(__Father_Root__ + 'knn.csv', '#', ',', (0, 6), (1, 3), 0)
     #测试集
     case = [101, 20]
     #kNN分类

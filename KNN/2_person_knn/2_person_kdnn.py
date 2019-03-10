@@ -1,7 +1,11 @@
 # -*- coding: UTF-8 -*-
 
+import os
 from sys import path
-path.append("../../")
+__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+__Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
+path.append(__Project_Root__)
+
 from DataTune.datatune import *
 
 import numpy as np
@@ -115,7 +119,8 @@ def classify_test(filename, K):
 
 def showdatas(data_array, label_array) :
     # fontfile = r"c:\windows\fonts\simsun.ttc"
-    fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+    #fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+    fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
 
     #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
     canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13,8))
@@ -158,7 +163,7 @@ def showdatas(data_array, label_array) :
     show_pyplot(plt)
 
 if __name__ == '__main__':
-    datasetcsv = "datingTestSet.csv"
+    datasetcsv = __Father_Root__ + "datingTestSet.csv"
     data_array, label_array = file2data_label(datasetcsv, '\t', 'utf-8')
     showdatas(data_array, label_array)
     classify_verification(datasetcsv, 0.1, 20)
