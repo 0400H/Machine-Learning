@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+#%%
 import os
 from sys import path
 __Father_Root__ = os.path.dirname(__file__) + '/'
@@ -20,10 +20,7 @@ def file2data_label(filename, interval, encode) :
     label_array = file_array[:, -1].astype(np.str)
 
     labels_dict = {'didntLike': 1, 'smallDoses':2, 'largeDoses':3}
-    labels_list = []
-
-    for label in label_array:
-        labels_list.append(labels_dict[label])
+    labels_list = [labels_dict[label] for label in label_array]
 
     return data_array, labels_list
 
@@ -41,14 +38,12 @@ Returns:
 def classify_love(inX, dataSet, labels, K):
     #numpy函数shape[0]返回dataSet的行数
     dataSetSize = dataSet.shape[0]
-    #在列向量方向上重复inX共1次(横向),行向量方向上重复inX共dataSetSize次(纵向)
+    #在列向量方向上重复inX， 共1次(横向), 行向量方向上重复inX， 共dataSetSize次(纵向)
     diffMat = np.tile(inX, (dataSetSize, 1)) - dataSet
-    #二维特征相减后平方
-    sqDiffMat = diffMat**2
-    #sum()所有元素相加,axis==0列相加,axis==1行相加
-    sqDistances = sqDiffMat.sum(axis=1)
+    #平方后元素相加,axis==0列相加,axis==1行相加
+    sqDistances = np.square(diffMat).sum(axis=1)
     #开方,计算出距离
-    distances = sqDistances**0.5
+    distances = np.power(sqDistances, 0.5)
     #返回distances中元素从小到大排序后的索引值
     sortedDistIndices = distances.argsort()
     #定一个记录类别次数的字典
@@ -81,14 +76,14 @@ def classify_verification(filename, ratio, K):
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
     for i in range(num_of_testcase):
         #前num_of_testcase个数据作为测试集,后num_of_testcase个数据作为训练集
-        classifierResult = classify_love(normMat[i,:], normMat[num_of_testcase:num_of_row,:], 
-                                        label_array[num_of_testcase:num_of_row], K)
+        classifierResult = classify_love(normMat[i,:], normMat[num_of_testcase:num_of_row,:],
+                                         label_array[num_of_testcase:num_of_row], K)
         print("correction: %s, prediction: %s, reality: %s" % (classifierResult == label_array[i],
                                                                labels_dict[classifierResult],
                                                                labels_dict[label_array[i]]))
         if classifierResult != label_array[i]:
             errorCount += 1.0
-    print("错误率:%f%%" %(errorCount/float(num_of_testcase)*100))
+    print("错误率:%f%%" %(errorCount / float(num_of_testcase) * 100))
 
 """
 Function description:使用数据集进行分类器测试
@@ -152,6 +147,7 @@ def showdatas(data_array, label_array) :
     didntLike = get_marker_Line2D('black', 6, 'didntLike')
     smallDoses = get_marker_Line2D('orange', 6, 'smallDoses')
     largeDoses = get_marker_Line2D('red', 6, 'largeDoses')
+
     #添加图例
     handle = [didntLike, smallDoses, largeDoses]
     add_legend(figure[0][0], handle)
