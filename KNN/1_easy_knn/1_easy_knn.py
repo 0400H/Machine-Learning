@@ -42,24 +42,23 @@ def dataset2date_label(filename, nop, interval, batch_dim, feature_dim, label_di
     Returns:
         sortedClassCount[0][0] - 分类结果
 '''
-def classify1(testcase, dataset, labels, k):
+def classify_easy_knn(testcase, dataset, labels, k):
     # 计算欧式距离
-    distances = np.sum((testcase - dataset) ** 2, axis = 1) ** 0.5
-    # k个最近数据的index
+    distances =  np.power(np.sum(np.square(testcase - dataset), axis = 1), 0.5)
+    # k个最近数据的label， index
     k_index = np.argsort(distances, kind = 'quicksort')[0 : k]
-    print(k_index)
-    # k个最近的label
-    k_labels = [labels[index] for index in k_index]
-    print(k_labels)
+    k_label = [labels[index] for index in k_index]
+    # print(k_index)
+    # print(k_label)
     # 出现次数最多的标签即为最终类别
-    label = collections.Counter(k_labels).most_common(1)[0][0]
+    label = collections.Counter(k_label).most_common(1)[0][0]
     return label
 
 if __name__ == '__main__':
-    date, labels = dataset2date_label(__Father_Root__ + 'knn.csv', '#', ',', (0, 6), (1, 3), 0)
+    date, labels = dataset2date_label(__Father_Root__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
     #测试集
-    case = [101, 20]
+    testcase = [(20, 90), (50, 60), (80, 10)]
     #kNN分类
-    test_class = classify1(case, date, labels, 3)
-    #打印分类结果
-    print(test_class)
+    for case in testcase :
+        test_class = classify_easy_knn(case, date, labels, 9)
+        print(case, ': ', test_class)

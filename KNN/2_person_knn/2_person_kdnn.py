@@ -12,8 +12,7 @@ import numpy as np
 import operator
 
 """
-Function description:
-    打开并解析文件，对数据进行分类：1:didntLike,2:smallDoses,3:largeDoses
+Function description: 打开并解析文件，对数据进行分类：1:didntLike, 2:smallDoses, 3:largeDoses
 """
 def file2data_label(filename, interval, encode) :
     file_array = file2array(filename, interval, encode)
@@ -104,9 +103,9 @@ def classify_test(filename, K):
     resultList = ['didntLike','smallDoses','largeDoses']
 
     #三维特征用户输入
-    precentTats = float(input("hobby1 time a year:"))
-    ffMiles = float(input("hobby2 time a year:"))
-    iceCream = float(input("hobby3 time a year:"))
+    precentTats = float(input("hobby1 times:"))
+    ffMiles = float(input("hobby2 times:"))
+    iceCream = float(input("hobby3 times:"))
     #生成NumPy数组,测试集
     inArr = np.array([ffMiles, precentTats, iceCream])
     #测试集归一化
@@ -131,23 +130,23 @@ def showdatas(data_array, label_array) :
     #画出散点图,以data_array矩阵的第一(hobby2)、第二列(hobby1)数据画散点数据,散点大小为15,透明度为0.5
     data2plt(figure[0][0], '00', data_array[:,0], data_array[:,1],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby2 / hobby1', 9, 'bold', 'red',
-             u'hobby2 time a year', 7, 'bold', 'black', 
-             u'hobby1 time a year', 7, 'bold', 'black')
+             u'hobby2 with hobby1', 9, 'bold', 'red',
+             u'hobby2 times', 7, 'bold', 'black', 
+             u'hobby1 times', 7, 'bold', 'black')
 
     #画出散点图,以data_array矩阵的第一(hobby2)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
     data2plt(figure[0][1], '01', data_array[:,0], data_array[:,2],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby2 / hobby3', 9, 'bold', 'red',
-             u'hobby2 time a year', 7, 'bold', 'black', 
-             u'hobby3 time a year', 7, 'bold', 'black')
+             u'hobby2 with hobby3', 9, 'bold', 'red',
+             u'hobby2 times', 7, 'bold', 'black', 
+             u'hobby3 times', 7, 'bold', 'black')
 
     #画出散点图,以data_array矩阵的第二(hobby1)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
     data2plt(figure[1][0], '10', data_array[:,1], data_array[:,2],
              fontfile, True, LabelsColors, 15, 0.5,
-             u'hobby1 / hobby3', 9, 'bold', 'red',
-             u'hobby1 time a year', 7, 'bold', 'black', 
-             u'hobby3 time a year', 7, 'bold', 'black')
+             u'hobby1 with hobby3', 9, 'bold', 'red',
+             u'hobby1 times', 7, 'bold', 'black', 
+             u'hobby3 times', 7, 'bold', 'black')
 
     #设置图例
     didntLike = get_marker_Line2D('black', 6, 'didntLike')
