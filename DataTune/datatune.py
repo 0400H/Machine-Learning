@@ -44,12 +44,14 @@ def data2matrix(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str) :
     return data_array[h_start:h_end, w_start:w_end].astype(out_dtype)
 
 def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_row=True) :
+    h_length = h_end - h_start
+    w_length = w_end - w_start
     data_array_by_dim = data_array[h_start:h_end, w_start:w_end]
     if out_row == True :
         data_array_by_dim.flatten().astype(out_dtype)
     else :
         data_array_by_dim.flatten('F').astype(out_dtype)
-    return data_array_by_dim
+    return data_array_by_dim.reshape(h_length * w_length)
 
 def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
     # 创建1x1024零向量
@@ -61,7 +63,7 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
         line_string = (fp_data[h_index])[w_start:w_end]
         img_col[h_index - h_start] = str2col(line_string, out_dtype)
 
-    return img_col.reshape(1, h_length * w_length)
+    return img_col.reshape(h_length * w_length)
 
 """
 Function description:对数据进行归一化

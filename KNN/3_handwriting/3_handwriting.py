@@ -91,7 +91,7 @@ def classify_test():
         #获得预测结果
         classifierResult = classify_handwriting(vectorUnderTest, trainingMat, hwLabels, 3)
         print("分类返回结果为%d\t真实结果为%d" % (classifierResult, classNumber))
-        if(classifierResult != classNumber):
+        if (classifierResult != classNumber):
             errorCount += 1.0
     print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/mTest))
 
@@ -115,7 +115,7 @@ def classify_test_sklearn():
         #将每一个文件的1x1024数据存储到trainingMat矩阵中
         trainingMat[i,:] = img2vector(__Father_Root__ + 'trainingDigits/%s' % (fileNameStr))
     #构建kNN分类器
-    neigh = kNN(n_neighbors = 3, algorithm = 'auto')
+    neigh = kNN(n_neighbors = 3, algorithm = 'auto') 
     #拟合模型, trainingMat为训练矩阵,hwLabels为对应的标签
     neigh.fit(trainingMat, hwLabels)
     #返回testDigits目录下的文件列表

@@ -46,7 +46,7 @@ def classify_easy_knn(testcase, dataset, labels, k):
     distances =  np.power(np.sum(np.square(testcase - dataset), axis = 1), 0.5)
     # k个最近数据的label， index
     k_index = np.argsort(distances, kind = 'quicksort')[0 : k]
-    k_label = [labels[index] for index in k_index]
+    k_label = [str(labels[index]) for index in k_index]
     # print(k_index)
     # print(k_label)
     # 出现次数最多的标签即为最终类别
