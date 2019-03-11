@@ -111,9 +111,9 @@ def classify_test(filename, K):
 
 
 def showdatas(data_array, label_array) :
-    fontfile = r"c:\windows\fonts\simsun.ttc"
+    # fontfile = r"c:\windows\fonts\simsun.ttc"
     # fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
-    # fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
+    fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
 
     #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
     canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13, 8))

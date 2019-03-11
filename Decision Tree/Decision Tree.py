@@ -18,7 +18,7 @@ Parameters: dataSet - 数据集
 Returns: shannonEnt - 经验熵(香农熵)
 """
 def calcShannonEnt(dataSet):
-    numEntires = len(dataSet)                        #返回数据集的行数
+    length = len(dataSet)                            #返回数据集的行数
     labelCounts = {}                                 #保存每个标签(Label)出现次数的字典
     for featVec in dataSet:                          #对每组特征向量进行统计
         currentLabel = featVec[-1]                   #提取标签(Label)信息
@@ -27,7 +27,7 @@ def calcShannonEnt(dataSet):
         labelCounts[currentLabel] += 1               #Label计数
     shannonEnt = 0.0                                 #经验熵(香农熵)
     for key in labelCounts:                          #计算香农熵
-        prob = float(labelCounts[key]) / numEntires  #选择该标签(Label)的概率
+        prob = float(labelCounts[key]) / length      #选择该标签(Label)的概率
         shannonEnt -= prob * log(prob, 2)            #利用公式计算
     return shannonEnt                                #返回经验熵(香农熵)
 
@@ -62,10 +62,10 @@ Parameters:
 """
 def splitDataSet(dataSet, axis, value):
     retDataSet = []                                        #创建返回的数据集列表
-    for featVec in dataSet:                             #遍历数据集
+    for featVec in dataSet:                                #遍历数据集
         if featVec[axis] == value :
             reducedFeatVec = featVec[:axis]                #去掉axis特征
-            reducedFeatVec.extend(featVec[axis+1:])     #将符合条件的添加到返回的数据集
+            reducedFeatVec.extend(featVec[axis+1:])        #将符合条件的添加到返回的数据集
             retDataSet.append(reducedFeatVec)
     return retDataSet                                      #返回划分后的数据集
 

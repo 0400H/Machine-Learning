@@ -16,7 +16,7 @@ from sklearn.neighbors import KNeighborsClassifier as kNN
 函数说明: 将32x32的二进制图像转换为1x1024向量。
 """
 def img2vector(filename):
-    return img2col(filename, 0, 32, 0, 32, np.int, 'utf-8')
+    return img2col(filename, 0, 32, 0, 32, np.int, 'utf-8').reshape(1,1024)
 
 """
 Function description: kNN算法, 分类器
@@ -79,9 +79,9 @@ def classify_test():
     #错误检测计数
     errorCount = 0.0
     #测试数据的数量
-    mTest = len(testFileList)
+    length_test = len(testFileList)
     #从文件中解析出测试集的类别并进行分类测试
-    for i in range(mTest):
+    for i in range(length_test):
         #获得文件的名字
         fileNameStr = testFileList[i]
         #获得分类的数字
@@ -93,7 +93,7 @@ def classify_test():
         print("分类返回结果为%d\t真实结果为%d" % (classifierResult, classNumber))
         if (classifierResult != classNumber):
             errorCount += 1.0
-    print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/mTest))
+    print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/length_test))
 
 def classify_test_sklearn():
     #测试集的Labels
@@ -123,9 +123,9 @@ def classify_test_sklearn():
     #错误检测计数
     errorCount = 0.0
     #测试数据的数量
-    mTest = len(testFileList)
+    length_test = len(testFileList)
     #从文件中解析出测试集的类别并进行分类测试
-    for i in range(mTest):
+    for i in range(length_test):
         #获得文件的名字
         fileNameStr = testFileList[i]
         #获得分类的数字
@@ -138,7 +138,7 @@ def classify_test_sklearn():
         print("分类返回结果为%d\t真实结果为%d" % (classifierResult, classNumber))
         if(classifierResult != classNumber):
             errorCount += 1.0
-    print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/mTest * 100))
+    print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/length_test * 100))
 
 if __name__ == '__main__':
     classify_test()

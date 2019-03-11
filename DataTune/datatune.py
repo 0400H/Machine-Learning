@@ -35,10 +35,10 @@ def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
 
 def str2col(string, out_dtype = np.int) :
     length = len(string.strip())
-    str_col = np.zeros(shape=(length)).astype(out_dtype)
+    str_col = np.zeros(shape = (length)).astype(out_dtype)
     for index in range(length) :
-        str_col[index] = np.array(string[index])
-    return str_col.astype(out_dtype).reshape(1, length)
+        str_col[index] = string[index]
+    return str_col.astype(out_dtype).reshape(length)
 
 def data2matrix(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str) :
     return data_array[h_start:h_end, w_start:w_end].astype(out_dtype)
@@ -57,7 +57,7 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
     # 创建1x1024零向量
     h_length = h_end - h_start
     w_length = w_end - w_start
-    img_col = np.zeros((h_length, w_length))
+    img_col = np.zeros(shape = (h_length, w_length))
     fp_data = open(filename, 'r', encoding = encode).readlines()
     for h_index in range(h_start, h_end) :
         line_string = (fp_data[h_index])[w_start:w_end]
@@ -73,14 +73,13 @@ def autoNorm(dataSet) :
     minVals = dataSet.min(0)
     maxVals = dataSet.max(0)
     ranges = maxVals - minVals
-    #创建shape为dataSet的array
-    normDataSet = np.zeros(np.shape(dataSet))
+    normDataSet = np.zeros(shape = (dataSet))
     #获取dataSet的行数
-    row = dataSet.shape[0]
+    num_of_row = dataSet.shape[0]
     #原始值减去最小值
-    normDataSet = dataSet - np.tile(minVals, (row, 1))
+    normDataSet = dataSet - np.tile(minVals, (num_of_row, 1))
     #除以最大和最小值的差,得到归一化数据
-    normDataSet = normDataSet / np.tile(ranges, (row, 1))
+    normDataSet = normDataSet / np.tile(ranges, (num_of_row, 1))
     #返回归一化数据结果,数据范围,最小值
     return normDataSet, ranges, minVals
 
