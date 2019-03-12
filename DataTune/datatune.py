@@ -68,21 +68,28 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
 """
 Function description:对数据进行归一化
 """
-def autoNorm(data_ndarray) :
+def normalization(data_ndarray) :
     #获得数据的极值和范围
     minVals = data_ndarray.min(0)
     maxVals = data_ndarray.max(0)
     ranges = maxVals - minVals
-
     data_num = data_ndarray.shape[0]
 
     data_range = np.tile(ranges, (data_num, 1))
     data_loss = data_ndarray - np.tile(minVals, (data_num, 1))
 
-    #除以最大和最小值的差,得到归一化数据
-    data_norm = data_loss / data_range
-    #返回归一化数据结果,数据范围,最小值
-    return data_norm, ranges, minVals
+    resault = data_loss / data_range
+    return resault, ranges, minVals
+
+def standardization(data_ndarray) :
+    meanVals = data_ndarray.mean(0)
+    data_num = data_ndarray.shape[0]
+
+    data_mean = np.tile(meanVals, (data_num, 1))
+    data_std = np.std(data_ndarray)
+
+    resault = (data_ndarray - data_mean) / data_std
+    return resault
 
 """
 Function description:

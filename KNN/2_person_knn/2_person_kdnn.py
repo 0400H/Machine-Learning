@@ -63,9 +63,9 @@ Function description: 使用数据集进行分类器验证
 def classify_verification(filename, ratio, K):
     data_array, label_array = data_loader(filename, '\t', 'utf-8')
     #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
-    normMat, ranges, minVals = autoNorm(data_array)
+    data_norm, _, _ = normalization(data_array)
 
-    #获得normMat的行数, 百分之十的测试数据的个数
+    #获得data_norm的行数, 百分之十的测试数据的个数
     ver_num = int(data_array.shape[0] * ratio)
 
     #分类错误计数
@@ -73,7 +73,7 @@ def classify_verification(filename, ratio, K):
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
     for i in range(ver_num):
         #前 ver_num 个数据作为测试集
-        classify_Result = classify_love(normMat[i], normMat, label_array, K)
+        classify_Result = classify_love(data_norm[i], data_norm, label_array, K)
         print("correction: %s, prediction: %s, reality: %s" % (classify_Result == label_array[i],
                                                                labels_dict[classify_Result],
                                                                labels_dict[label_array[i]]))
@@ -88,7 +88,7 @@ def classify_test(filename, K):
     #打开并处理数据
     data_array, label_array = data_loader(filename, '\t', 'utf-8')
     #训练集归一化
-    normMat, ranges, minVals = autoNorm(data_array)
+    data_norm, ranges, minVals = normalization(data_array)
 
     #定义输出结果
     resultList = ['didntLike','smallDoses','largeDoses']
@@ -102,7 +102,7 @@ def classify_test(filename, K):
     #测试集归一化
     norminArr = (inArr - minVals) / ranges
     #返回分类结果
-    classify_Result = classify_love(norminArr, normMat, label_array, K)
+    classify_Result = classify_love(norminArr, data_norm, label_array, K)
     #打印结果
     print("prediction: %s" % (resultList[classify_Result-1]))
 
