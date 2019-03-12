@@ -7,7 +7,6 @@ __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
 path.append(__Project_Root__)
 
 from DataTune.datatune import *
-
 import numpy as np
 import operator
 from sklearn.neighbors import KNeighborsClassifier as kNN

@@ -54,10 +54,9 @@ def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_r
     return data_array_by_dim.reshape(h_length * w_length)
 
 def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
-    # 创建1x1024零向量
     h_length = h_end - h_start
     w_length = w_end - w_start
-    img_col = np.zeros(shape = (h_length, w_length))
+    img_col = np.ndarray(shape=(h_length, w_length))
     fp_data = open(filename, 'r', encoding = encode).readlines()
     for h_index in range(h_start, h_end) :
         line_string = (fp_data[h_index])[w_start:w_end]
@@ -66,7 +65,7 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
     return img_col.reshape(h_length * w_length)
 
 """
-Function description:对数据进行归一化
+Function description: 对数据进行归一化, 标准化
 """
 def normalization(data_ndarray) :
     #获得数据的极值和范围
@@ -92,13 +91,7 @@ def standardization(data_ndarray) :
     return resault
 
 """
-Function description:
-    可视化数据
-Parameters:
-    datingDataMat - 特征矩阵
-    datingLabels  - 分类Label
-Returns:
-    none
+Function description: 可视化数据
 """
 
 def get_marker_Line2D(ml_color, ml_markersize, ml_label) :
