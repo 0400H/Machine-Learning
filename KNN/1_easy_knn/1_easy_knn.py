@@ -7,23 +7,13 @@ __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
 path.append(__Project_Root__)
 
 from DataTune.datatune import *
-
 import numpy as np
 import collections
-# import operator
 
 '''
-    Function description:
-        read data_array fpom csv
-    Parameters:
-        filename
-        label_dim
-        batch_dim
-    Returns:
-        data
-        label
+    Function description: read data_array, labels from csv
 '''
-def dataset2dateandlabel(filename, nop, interval, batch_dim, feature_dim, label_dim) :
+def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim) :
     (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
     data_array = file2array1(filename, np.str, nop, interval)
     data = data2matrix(data_array, h_start, h_end, w_start, w_end, np.float)
@@ -34,19 +24,19 @@ def dataset2dateandlabel(filename, nop, interval, batch_dim, feature_dim, label_
 '''
     函数说明:kNN算法,分类器
     Parameters:
-        testcase - 用于分类的数据(测试集)
-        dataSet  - 用于训练的数据(训练集)
-        labes    - 分类标签
-        k        - kNN算法参数,选择距离最小的k个点
+        testcase     - 用于分类的数据(测试集)
+        val_dataset  - 用于训练的数据(训练集)
+        labes        - 分类标签
+        k            - kNN算法参数,选择距离最小的k个点
     Returns:
         sortedClassCount[0][0] - 分类结果
 '''
-def classify_easy_knn(testcase, dataset, labels, k):
+def classify_easy_knn(testcase, val_dataset, val_labels, k):
     # 计算欧式距离
-    distances =  np.power(np.sum(np.square(testcase - dataset), axis = 1), 0.5)
+    distances =  np.power(np.sum(np.square(testcase - val_dataset), axis = 1), 0.5)
     # k个最近数据的label， index
     k_index = np.argsort(distances, kind = 'quicksort')[0 : k]
-    k_label = [str(labels[index]) for index in k_index]
+    k_label = [str(val_labels[index]) for index in k_index]
     # print(k_index)
     # print(k_label)
     # 出现次数最多的标签即为最终类别
@@ -54,11 +44,10 @@ def classify_easy_knn(testcase, dataset, labels, k):
     return label
 
 if __name__ == '__main__':
-    date, labels = dataset2dateandlabel(__Father_Root__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
-    labels = np.ndarray.tolist(labels)
+    val_data, val_labels = data_loader(__Father_Root__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
     #测试集
-    testcase = [(20, 90), (50, 60), (80, 10)]
+    test_dataset = [(20, 90), (50, 60), (80, 10)]
     #kNN分类
-    for case in testcase :
-        test_class = classify_easy_knn(case, date, labels, 9)
-        print(case, ': ', test_class)
+    for testcase in test_dataset :
+        classify_class = classify_easy_knn(testcase, val_data, val_labels, 9)
+        print(testcase, ': ', classify_class)

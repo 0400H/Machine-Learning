@@ -20,9 +20,9 @@ def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
     #针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
     file2list[0] = file2list[0].lstrip('\ufeff')
     #得到文件行数,列数, 创建合适的 NumPy 矩阵
-    num_of_row = len(file2list)
+    data_num = len(file2list)
     num_of_column = len(file2list[0]) if interval == '' else file2list[0].count(interval) + 1
-    data_array = np.zeros((num_of_row, num_of_column)).astype(out_dtype)
+    data_array = np.zeros((data_num, num_of_column)).astype(out_dtype)
 
     index = 0
     for line in file2list :
@@ -68,20 +68,21 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
 """
 Function description:对数据进行归一化
 """
-def autoNorm(dataSet) :
+def autoNorm(data_ndarray) :
     #获得数据的极值和范围
-    minVals = dataSet.min(0)
-    maxVals = dataSet.max(0)
+    minVals = data_ndarray.min(0)
+    maxVals = data_ndarray.max(0)
     ranges = maxVals - minVals
-    normDataSet = np.zeros(shape = (dataSet))
-    #获取dataSet的行数
-    num_of_row = dataSet.shape[0]
-    #原始值减去最小值
-    normDataSet = dataSet - np.tile(minVals, (num_of_row, 1))
+
+    data_num = data_ndarray.shape[0]
+
+    data_range = np.tile(ranges, (data_num, 1))
+    data_loss = data_ndarray - np.tile(minVals, (data_num, 1))
+
     #除以最大和最小值的差,得到归一化数据
-    normDataSet = normDataSet / np.tile(ranges, (num_of_row, 1))
+    data_norm = data_loss / data_range
     #返回归一化数据结果,数据范围,最小值
-    return normDataSet, ranges, minVals
+    return data_norm, ranges, minVals
 
 """
 Function description:

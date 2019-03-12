@@ -7,14 +7,13 @@ __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
 path.append(__Project_Root__)
 
 from DataTune.datatune import *
-
 import numpy as np
 import operator
 
 """
 Function description: 打开并解析文件，对数据进行分类：1:didntLike, 2:smallDoses, 3:largeDoses
 """
-def file2data_label(filename, interval, encode) :
+def data_loader(filename, interval, encode) :
     file_array = file2array2(filename, np.str, interval, encode)
     data_array = file_array[:, 0:-1].astype(np.float)
     label_array = file_array[:, -1].astype(np.str)
@@ -62,34 +61,32 @@ def classify_love(inX, dataSet, labels, K):
 Function description: 使用数据集进行分类器验证
 """
 def classify_verification(filename, ratio, K):
-    data_array, label_array = file2data_label(filename, '\t', 'utf-8')
+    data_array, label_array = data_loader(filename, '\t', 'utf-8')
     #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
     normMat, ranges, minVals = autoNorm(data_array)
-    #获得normMat的行数
-    num_of_row = normMat.shape[0]
-    #百分之十的测试数据的个数
-    num_of_testcase = int(num_of_row * ratio)
+
+    #获得normMat的行数, 百分之十的测试数据的个数
+    ver_num = int(data_array.shape[0] * ratio)
+
     #分类错误计数
     errorCount = 0.0
-
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
-    for i in range(num_of_testcase):
-        #前num_of_testcase个数据作为测试集,后num_of_testcase个数据作为训练集
-        classifierResult = classify_love(normMat[i,:], normMat[num_of_testcase:num_of_row,:],
-                                         label_array[num_of_testcase:num_of_row], K)
-        print("correction: %s, prediction: %s, reality: %s" % (classifierResult == label_array[i],
-                                                               labels_dict[classifierResult],
+    for i in range(ver_num):
+        #前 ver_num 个数据作为测试集
+        classify_Result = classify_love(normMat[i], normMat, label_array, K)
+        print("correction: %s, prediction: %s, reality: %s" % (classify_Result == label_array[i],
+                                                               labels_dict[classify_Result],
                                                                labels_dict[label_array[i]]))
-        if classifierResult != label_array[i]:
+        if classify_Result != label_array[i]:
             errorCount += 1.0
-    print("错误率:%f%%" %(errorCount / float(num_of_testcase) * 100))
+    print("错误率:%f%%" %(errorCount / float(ver_num) * 100))
 
 """
 Function description:使用数据集进行分类器测试
 """
 def classify_test(filename, K):
     #打开并处理数据
-    data_array, label_array = file2data_label(filename, '\t', 'utf-8')
+    data_array, label_array = data_loader(filename, '\t', 'utf-8')
     #训练集归一化
     normMat, ranges, minVals = autoNorm(data_array)
 
@@ -105,9 +102,9 @@ def classify_test(filename, K):
     #测试集归一化
     norminArr = (inArr - minVals) / ranges
     #返回分类结果
-    classifierResult = classify_love(norminArr, normMat, label_array, K)
+    classify_Result = classify_love(norminArr, normMat, label_array, K)
     #打印结果
-    print("prediction: %s" % (resultList[classifierResult-1]))
+    print("prediction: %s" % (resultList[classify_Result-1]))
 
 
 def showdatas(data_array, label_array) :
@@ -158,7 +155,7 @@ def showdatas(data_array, label_array) :
 
 if __name__ == '__main__':
     datasetcsv = __Father_Root__ + "datingTestSet.csv"
-    data_array, label_array = file2data_label(datasetcsv, '\t', 'utf-8')
+    data_array, label_array = data_loader(datasetcsv, '\t', 'utf-8')
     showdatas(data_array, label_array)
     classify_verification(datasetcsv, 0.1, 20)
     classify_test(datasetcsv, 20)
