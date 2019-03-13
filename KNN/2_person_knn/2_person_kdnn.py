@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-import os
-from sys import path
-__Father_Root__ = os.path.dirname(__file__) + '/'
+import os, sys
+__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
-path.append(__Project_Root__)
+sys.path.append(__Project_Root__)
 
 from DataTune.datatune import *
 import numpy as np
