@@ -14,30 +14,17 @@ import random
 
 
 """
-函数说明:加载数据
-Parameters:
-    无
-Returns:
-    dataMat - 数据列表
-    labelMat - 标签列表
+函数说明: 加载数据
 """
-def loadDataSet():
-    dataMat = []                                                        #创建数据列表
-    labelMat = []                                                        #创建标签列表
-    fr = open(__Father_Root__ + 'testSet.csv')                                            #打开文件    
-    for line in fr.readlines():                                            #逐行读取
-        lineArr = line.strip().split()                                    #去回车，放入列表
-        dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])        #添加数据
-        labelMat.append(int(lineArr[2]))                                #添加标签
-    fr.close()                                                            #关闭文件
-    return dataMat, labelMat                                            #返回
+def data_loader(filename):
+    file_array = file2array2(filename, np.str, '\t', 'utf-8')
+    data_array = np.ones(shape=(len(file_array), 3))
+    data_array[:, 1:] = file_array[:, :-1].astype(np.float)
+    label_array = file_array[:, -1].astype(np.float).reshape(-1)
+    return data_array, label_array
 
 """
-函数说明:sigmoid函数
-Parameters:
-    inX - 数据
-Returns:
-    sigmoid函数
+函数说明: sigmoid函数
 """
 def sigmoid(inX):
     return 1.0 / (1 + np.exp(-inX))
@@ -95,33 +82,6 @@ def stocGradAscent1(dataMatrix, classLabels, numIter=150):
     return weights,weights_array                                             #返回
 
 """
-函数说明:绘制数据集
-Parameters:
-    weights - 权重参数数组
-"""
-def plotBestFit(weights):
-    dataMat, labelMat = loadDataSet()                                   #加载数据集
-    dataArr = np.array(dataMat)                                         #转换成numpy的array数组
-    n = np.shape(dataMat)[0]                                            #数据个数
-    xcord1 = []; ycord1 = []                                            #正样本
-    xcord2 = []; ycord2 = []                                            #负样本
-    for i in range(n):                                                  #根据数据集标签进行分类
-        if int(labelMat[i]) == 1:
-            xcord1.append(dataArr[i,1]); ycord1.append(dataArr[i,2])    #1为正样本
-        else:
-            xcord2.append(dataArr[i,1]); ycord2.append(dataArr[i,2])    #0为负样本
-    fig = plt.figure()
-    ax = fig.add_subplot(111)                                            #添加subplot
-    ax.scatter(xcord1, ycord1, s = 20, c = 'red', marker = 's',alpha=.5)#绘制正样本
-    ax.scatter(xcord2, ycord2, s = 20, c = 'green',alpha=.5)            #绘制负样本
-    x = np.arange(-3.0, 3.0, 0.1)
-    y = (-weights[0] - weights[1] * x) / weights[2]
-    ax.plot(x, y)
-    plt.title('BestFit')                                                #绘制title
-    plt.xlabel('X1'); plt.ylabel('X2')                                    #绘制label
-    plt.show()
-
-"""
 函数说明:绘制回归系数与迭代次数的关系
 Parameters:
     weights_array1 - 回归系数数组1
@@ -150,7 +110,7 @@ def plotWeights(weights_array1, weights_array2):
     #绘制w2与迭代次数的关系
     axs[2][0].plot(x1,weights_array1[:,2])
     axs2_xlabel_text = axs[2][0].set_xlabel(u'迭代次数',FontProperties=font)
-    axs2_ylabel_text = axs[2][0].set_ylabel(u'W1',FontProperties=font)
+    axs2_ylabel_text = axs[2][0].set_ylabel(u'W2',FontProperties=font)
     plt.setp(axs2_xlabel_text, size=10, weight='bold', color='black')  
     plt.setp(axs2_ylabel_text, size=10, weight='bold', color='black') 
 
@@ -169,14 +129,14 @@ def plotWeights(weights_array1, weights_array2):
     #绘制w2与迭代次数的关系
     axs[2][1].plot(x2,weights_array2[:,2])
     axs2_xlabel_text = axs[2][1].set_xlabel(u'迭代次数',FontProperties=font)
-    axs2_ylabel_text = axs[2][1].set_ylabel(u'W1',FontProperties=font)
+    axs2_ylabel_text = axs[2][1].set_ylabel(u'W2',FontProperties=font)
     plt.setp(axs2_xlabel_text, size=10, weight='bold', color='black')  
     plt.setp(axs2_ylabel_text, size=10, weight='bold', color='black') 
 
     plt.show()        
 
 if __name__ == '__main__':
-    dataMat, labelMat = loadDataSet()            
+    dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')
     weights1,weights_array1 = stocGradAscent1(np.array(dataMat), labelMat)
 
     weights2,weights_array2 = gradAscent(dataMat, labelMat)
