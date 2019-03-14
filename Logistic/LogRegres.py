@@ -2,7 +2,7 @@
 
 import os
 from sys import path
-__Father_Root__ = os.path.dirname(__file__) + '/'
+__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../')
 path.append(__Project_Root__)
 
@@ -11,28 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 """
-函数说明:梯度上升算法测试函数
-求函数f(x) = -x^2 + 4x的极大值
-"""
-def Gradient_Ascent_test():
-    def f_prime(x_old):                                    #f(x)的导数
-        return -2 * x_old + 4
-    x_old = -1                                            #初始值，给一个小于x_new的值
-    x_new = 0                                            #梯度上升算法初始值，即从(0,0)开始
-    alpha = 0.01                                        #步长，也就是学习速率，控制更新的幅度
-    presision = 0.00000001                                #精度，也就是更新阈值
-    while abs(x_new - x_old) > presision:
-        x_old = x_new
-        x_new = x_old + alpha * f_prime(x_old)            #上面提到的公式
-    print(x_new)                                        #打印最终求解的极值近似值
-
-"""
 函数说明:加载数据
-Parameters:
-    无
-Returns:
-    dataMat - 数据列表
-    labelMat - 标签列表
 """
 
 def data_loader(filename):
@@ -42,6 +21,41 @@ def data_loader(filename):
     label_array = file_array[:, -1].astype(np.float).reshape(-1)
 
     return data_array, label_array
+
+
+def showdatas(x, f, f_p) :
+    fontfile = r"c:\windows\fonts\simsun.ttc"
+    # fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
+    # fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
+
+    canvas, figure = plt.subplots(nrows=1, ncols=2,sharex=False, sharey=False, figsize=(16, 8))
+    data2plt(figure[0], '00', x, f, fontfile, True, 'orange', 5, 0.5, u'', 9,
+             'bold', 'red', u'x', 7, 'bold', 'black', u'f', 7, 'bold', 'black')
+    data2plt(figure[1], '00', x, f_p, fontfile, True, 'orange', 5, 0.5, u'', 9,
+             'bold', 'red', u'x', 7, 'bold', 'black', u'f\'', 7, 'bold', 'black')
+    show_pyplot(plt)
+
+"""
+函数说明:梯度上升算法测试函数
+求函数f(x) = -x^2 + 4x的极大值
+"""
+def f_derivative(x):                                  #f(x)的导数
+    return -2 * x + 4
+
+def Gradient_Ascent_test(func_derivative, lr=0.001):
+
+    x_list = [num for num in range(-50, 50)]
+    f_prime_list = [f_prime(num) for num in x_list]
+    f_list = [4*num - 2*(num**2) for num in x_list]
+    showdatas(x_list, f_list, f_prime_list)
+
+    presision = 0.00000001                               #精度，也就是更新阈值
+    x_old = 0                                            #初始值，给一个小于x_new的值
+    x_new = x_old + 2 * presision                        #梯度上升算法初始值，即从(0,0)开始
+    while abs(x_new - x_old) > presision:
+        x_old = x_new
+        x_new = x_old + lr * func_derivative(x_old)      #上面提到的公式
+    print(x_new)                                         #打印最终求解的极值近似值
 
 """
 函数说明:sigmoid函数
@@ -123,6 +137,7 @@ def plotBestFit(weights):
     plt.show()        
 
 if __name__ == '__main__':
-    dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')    
-    weights = gradAscent(dataMat, labelMat)
-    plotBestFit(weights)
+    # dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')    
+    # weights = gradAscent(dataMat, labelMat)
+    # plotBestFit(weights)
+    Gradient_Ascent_test()
