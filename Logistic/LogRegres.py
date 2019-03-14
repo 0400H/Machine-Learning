@@ -34,16 +34,14 @@ Returns:
     dataMat - 数据列表
     labelMat - 标签列表
 """
-def loadDataSet():
-    dataMat = []                                                        #创建数据列表
-    labelMat = []                                                       #创建标签列表
-    fr = open(__Father_Root__ + 'testSet.csv')                          #打开文件
-    for line in fr.readlines():                                         #逐行读取
-        lineArr = line.strip().split()                                  #去回车，放入列表
-        dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])     #添加数据
-        labelMat.append(int(lineArr[2]))                                #添加标签
-    fr.close()                                                          #关闭文件
-    return dataMat, labelMat                                            #返回
+
+def data_loader(filename):
+    file_array = file2array2(filename, np.str, '\t', 'utf-8')
+    data_array = np.ones(shape=(len(file_array), 3))
+    data_array[:, 1:] = file_array[:, :-1].astype(np.float)
+    label_array = file_array[:, -1].astype(np.float).reshape(-1)
+
+    return data_array, label_array
 
 """
 函数说明:sigmoid函数
@@ -59,14 +57,14 @@ def sigmoid(inX):
 函数说明:梯度上升算法
 
 Parameters:
-    dataMatIn - 数据集
-    classLabels - 数据标签
+    data_ndarray - 数据集
+    labels_list - 数据标签
 Returns:
     weights.getA() - 求得的权重数组(最优参数)
 """
-def gradAscent(dataMatIn, classLabels):
-    dataMatrix = np.mat(dataMatIn)                                        #转换成numpy的mat
-    labelMat = np.mat(classLabels).transpose()                            #转换成numpy的mat,并进行转置
+def gradAscent(data_ndarray, labels_list):
+    dataMatrix = np.mat(data_ndarray)                                        #转换成numpy的mat
+    labelMat = np.mat(labels_list).transpose()                            #转换成numpy的mat,并进行转置
     m, n = np.shape(dataMatrix)                                           #返回dataMatrix的大小。m为行数,n为列数。
     alpha = 0.001                                                         #移动步长,也就是学习速率,控制更新的幅度。
     maxCycles = 500                                                       #最大迭代次数
@@ -81,7 +79,7 @@ def gradAscent(dataMatIn, classLabels):
 函数说明:绘制数据集
 """
 def plotDataSet():
-    dataMat, labelMat = loadDataSet()                                     #加载数据集
+    dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')                                     #加载数据集
     dataArr = np.array(dataMat)                                           #转换成numpy的array数组
     n = np.shape(dataMat)[0]                                              #数据个数
     xcord1 = []; ycord1 = []                                              #正样本
@@ -103,7 +101,7 @@ def plotDataSet():
 函数说明:绘制数据集
 """
 def plotBestFit(weights):
-    dataMat, labelMat = loadDataSet()                                     #加载数据集
+    dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')                                     #加载数据集
     dataArr = np.array(dataMat)                                           #转换成numpy的array数组
     n = np.shape(dataMat)[0]                                              #数据个数
     xcord1 = []; ycord1 = []                                              #正样本
@@ -125,6 +123,6 @@ def plotBestFit(weights):
     plt.show()        
 
 if __name__ == '__main__':
-    dataMat, labelMat = loadDataSet()    
+    dataMat, labelMat = data_loader(__Father_Root__ + 'testSet.csv')    
     weights = gradAscent(dataMat, labelMat)
     plotBestFit(weights)

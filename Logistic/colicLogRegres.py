@@ -1,10 +1,9 @@
 # -*- coding:UTF-8 -*-
 
-import os
-from sys import path
+import os, sys
 __Father_Root__ = os.path.dirname(__file__) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../')
-path.append(__Project_Root__)
+sys.path.append(__Project_Root__)
 
 from DataTune.datatune import *
 from sklearn.linear_model import LogisticRegression
@@ -12,11 +11,7 @@ import numpy as np
 import random
 
 """
-函数说明:sigmoid函数
-Parameters:
-    inX - 数据
-Returns:
-    sigmoid函数
+函数说明: sigmoid函数
 """
 def sigmoid(inX):
     return 1.0 / (1 + np.exp(-inX))
@@ -31,17 +26,17 @@ Returns:
     weights - 求得的回归系数数组(最优参数)
 """
 def stocGradAscent1(dataMatrix, classLabels, numIter=150):
-    m,n = np.shape(dataMatrix)                                                #返回dataMatrix的大小。m为行数,n为列数。
-    weights = np.ones(n)                                                       #参数初始化                                        #存储每次更新的回归系数
+    m, n = np.shape(dataMatrix)                                                #返回dataMatrix的大小。m为行数,n为列数。
+    weights = np.ones(n)                                                       #参数初始化， 存储每次更新的回归系数
     for j in range(numIter):                                            
         dataIndex = list(range(m))
         for i in range(m):            
-            alpha = 4/(1.0+j+i)+0.01                                            #降低alpha的大小，每次减小1/(j+i)。
-            randIndex = int(random.uniform(0,len(dataIndex)))                #随机选取样本
+            alpha = 4/(1.0+j+i)+0.01                                           #降低alpha的大小，每次减小1/(j+i)。
+            randIndex = int(random.uniform(0,len(dataIndex)))                  #随机选取样本
             h = sigmoid(sum(dataMatrix[randIndex]*weights))                    #选择随机选取的一个样本，计算h
             error = classLabels[randIndex] - h                                 #计算误差
-            weights = weights + alpha * error * dataMatrix[randIndex]       #更新回归系数
-            del(dataIndex[randIndex])                                         #删除已经使用的样本
+            weights = weights + alpha * error * dataMatrix[randIndex]          #更新回归系数
+            del(dataIndex[randIndex])                                          #删除已经使用的样本
     return weights                                                             #返回
 
 
@@ -69,7 +64,7 @@ def gradAscent(dataMatIn, classLabels):
 
 
 """
-函数说明:使用Python写的Logistic分类器做预测
+函数说明: 使用Python写的Logistic分类器做预测
 """
 def colicTest():
     frTrain = open(__Father_Root__ + 'horseColicTraining.csv')                                        #打开训练集
@@ -111,7 +106,7 @@ def classifyVector(inX, weights):
 """
 函数说明:使用Sklearn构建Logistic回归分类器
 """
-def colicSklearn():
+def logistic_regression_sklearn():
     frTrain = open(__Father_Root__ + 'horseColicTraining.csv')                                        #打开训练集
     frTest = open(__Father_Root__ + 'horseColicTest.csv')                                                #打开测试集
     trainingSet = []; trainingLabels = []
@@ -135,4 +130,4 @@ def colicSklearn():
     print('正确率:%f%%' % test_accurcy)
 
 if __name__ == '__main__':
-    colicSklearn()
+    logistic_regression_sklearn()
