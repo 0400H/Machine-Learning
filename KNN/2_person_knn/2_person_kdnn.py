@@ -107,10 +107,6 @@ def classify_test(filename, K):
 
 
 def showdatas(data_array, label_array) :
-    # fontfile = r"c:\windows\fonts\simsun.ttc"
-    # fontfile = r"/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
-    fontfile = r"/usr/share/fonts/opentype/dejavu-sans-mono/DejaVuSansMono.ttf"
-
     #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
     canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13, 8))
 
@@ -118,24 +114,24 @@ def showdatas(data_array, label_array) :
     LabelsColors = [LabelsColorsDict[i] for i in label_array]
 
     #画出散点图,以data_array矩阵的第一(hobby2)、第二列(hobby1)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[0][0], '00', data_array[:,0], data_array[:,1],
-             fontfile, True, LabelsColors, 15, 0.5,
+    data2plt(figure[0][0], data_array[:,0],
+             data_array[:,1], LabelsColors, 15, 0.5,
              u'hobby2 with hobby1', 9, 'bold', 'red',
-             u'hobby2 times', 7, 'bold', 'black', 
+             u'hobby2 times', 7, 'bold', 'black',
              u'hobby1 times', 7, 'bold', 'black')
 
     #画出散点图,以data_array矩阵的第一(hobby2)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[0][1], '01', data_array[:,0], data_array[:,2],
-             fontfile, True, LabelsColors, 15, 0.5,
+    data2plt(figure[0][1], data_array[:,0],
+             data_array[:,2], LabelsColors, 15, 0.5,
              u'hobby2 with hobby3', 9, 'bold', 'red',
-             u'hobby2 times', 7, 'bold', 'black', 
+             u'hobby2 times', 7, 'bold', 'black',
              u'hobby3 times', 7, 'bold', 'black')
 
     #画出散点图,以data_array矩阵的第二(hobby1)、第三列(hobby3)数据画散点数据,散点大小为15,透明度为0.5
-    data2plt(figure[1][0], '10', data_array[:,1], data_array[:,2],
-             fontfile, True, LabelsColors, 15, 0.5,
+    data2plt(figure[1][0], data_array[:,1],
+             data_array[:,2], LabelsColors, 15, 0.5,
              u'hobby1 with hobby3', 9, 'bold', 'red',
-             u'hobby1 times', 7, 'bold', 'black', 
+             u'hobby1 times', 7, 'bold', 'black',
              u'hobby3 times', 7, 'bold', 'black')
 
     #设置图例

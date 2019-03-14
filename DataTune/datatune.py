@@ -104,19 +104,29 @@ def add_legend(plt_figure, handle_ml) :
 def show_pyplot(plt) :
     return plt.show()
 
-def data2plt(plt_figure, figure_name, data_x, data_y,
-             font_file, color_dim_x, plt_color_list,
-             point_pixel, point_transparency,
-             t_label, t_fontsize, t_weight, t_color, 
+def data2plt(plt_figure, data_x, data_y,
+             color_list, point_pixel, point_trans,
+             t_label, t_fontsize, t_weight, t_color,
              x_label, x_fontsize, x_weight, x_color,
-             y_label, y_fontsize, y_weight, y_color) :
-    plt_figure.scatter(x=data_x, y=data_y, color=plt_color_list,
-                       s=point_pixel, alpha=point_transparency)
-    plt_font = FontProperties(fname=font_file, size=14)
-    title_text = plt_figure.set_title(t_label, FontProperties=plt_font)
-    x_text = plt_figure.set_xlabel(x_label, FontProperties=plt_font)
-    y_text = plt_figure.set_ylabel(y_label, FontProperties=plt_font)
-    plt.setp(title_text, size=t_fontsize, weight=t_weight, color=t_color)
-    plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
-    plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
+             y_label, y_fontsize, y_weight, y_color,
+             fontfile_path = '') :
+    if fontfile_path != '' :
+        font = FontProperties(fname=fontfile_path, size=10)
+        plt_figure.scatter(x=data_x, y=data_y, color=color_list,
+                        s=point_pixel, alpha=point_trans)
+        t_text = plt_figure.set_title(t_label, FontProperties=font)
+        x_text = plt_figure.set_xlabel(x_label, FontProperties=font)
+        y_text = plt_figure.set_ylabel(y_label, FontProperties=font)
+        plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
+        plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
+        plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
+    else :
+        plt_figure.scatter(x=data_x, y=data_y, color=color_list,
+                        s=point_pixel, alpha=point_trans)
+        t_text = plt_figure.set_title(t_label)
+        x_text = plt_figure.set_xlabel(x_label)
+        y_text = plt_figure.set_ylabel(y_label)
+        plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
+        plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
+        plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
     return None
