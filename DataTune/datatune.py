@@ -1,15 +1,78 @@
 # -*- coding: UTF-8 -*-
 
 import numpy as np
-from matplotlib.font_manager import FontProperties
+import numpy.polynomial.polynomial as poly
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+from mpl_toolkits.mplot3d import Axes3D
 
 """
 Function description: 从文件读取数据到array
 """
+def file2array(filename='', jump_out_key=[], enter_key=[], select_key=[], dtype=np.float):
+    select_key_length = len(select_key)
+    data_list = [[] for i in range(select_key_length)]
 
-def file2array1(filename, in_dtype, nop='#', interval='') :
+    with open(filename, 'r', encoding='utf-8') as fp :
+        for line in fp.readlines() :
+            correct_line = True
+            if type(jump_out_key) is type([]) :
+                for key in jump_out_key :
+                    if key != '' and line.find(key) != -1 :
+                        correct_line = False
+                        break
+            else:
+                if jump_out_key != '' and line.find(jump_out_key) != -1 :
+                    correct_line = False
+                    continue
+
+            if correct_line == True:
+                correct_line == False
+            else:
+                continue
+
+            if type(enter_key) is type([]) :
+                for key in enter_key :
+                    if key == '' or line.find(key) == -1 :
+                        correct_line = False
+                        break
+                    else:
+                        correct_line = True
+            else:
+                if enter_key == '' or line.find(enter_key) == -1 :
+                    correct_line = False
+                    continue
+                else:
+                    correct_line = True
+
+            if correct_line == False:
+                continue
+
+            for select_key_index in range(select_key_length):
+                start_key, end_key = select_key[select_key_index]
+                if end_key != '':
+                    if line.find(end_key) != -1 :
+                        start_index = 0
+                        if start_key != '':
+                            if line.find(start_key) != -1:
+                                start_index = line.index(start_key) + len(start_key)
+                            else:
+                                continue
+                        end_index = line.index(end_key)
+                        string = line[start_index : end_index].strip('\n')
+                        data_list[select_key_index].append(string)
+                else :
+                    continue
+
+    data_list_array, length_list = [], []
+    for data in data_list:
+        length_list.append(len(data))
+        data_list_array.append(np.array(data).astype(dtype))
+
+    return data_list_array, length_list
+
+def file2array1(filename, in_dtype, nop='#', interval='', usecols=None, unpack=False) :
     if (interval == '') :
         return np.loadtxt(filename, dtype=in_dtype, comments=nop)
     else :
@@ -33,6 +96,17 @@ def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
 
     return data_array.astype(out_dtype)
 
+def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
+    h_length = h_end - h_start
+    w_length = w_end - w_start
+    img_col = np.ndarray(shape=(h_length, w_length))
+    fp_data = open(filename, 'r', encoding = encode).readlines()
+    for h_index in range(h_start, h_end) :
+        line_string = (fp_data[h_index])[w_start:w_end]
+        img_col[h_index - h_start] = str2col(line_string, out_dtype)
+
+    return img_col.reshape(h_length * w_length)
+
 def str2col(string, out_dtype = np.int) :
     length = len(string.strip())
     str_col = np.zeros(shape = (length)).astype(out_dtype)
@@ -53,19 +127,8 @@ def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_r
         data_array_by_dim.flatten('F').astype(out_dtype)
     return data_array_by_dim.reshape(h_length * w_length)
 
-def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
-    h_length = h_end - h_start
-    w_length = w_end - w_start
-    img_col = np.ndarray(shape=(h_length, w_length))
-    fp_data = open(filename, 'r', encoding = encode).readlines()
-    for h_index in range(h_start, h_end) :
-        line_string = (fp_data[h_index])[w_start:w_end]
-        img_col[h_index - h_start] = str2col(line_string, out_dtype)
-
-    return img_col.reshape(h_length * w_length)
-
 """
-Function description: 对数据进行归一化, 标准化
+Function description: 数据处理
 """
 def normalization(data_ndarray) :
     #获得数据的极值和范围
@@ -90,43 +153,97 @@ def standardization(data_ndarray) :
     resault = (data_ndarray - data_mean) / data_std
     return resault
 
+def outlier_process(data_array, length, gamma):
+    data_mean = np.mean(data_array[:length])
+    data_std = np.std(data_array[:length])
+    for index in range(1, length):
+        if data_array[index] > data_mean + gamma * data_std or \
+           data_array[index] < data_mean - gamma * data_std :
+            data_array[index] = data_array[index-1]
+    return None
+
+def auto_fit(data_x, data_y, start, end, degree):
+    # Polynomial fitting
+    coefs = poly.polyfit(data_x[start:end], data_y[start:end], degree)
+    data_fit = poly.polyval(data_x[start:end], coefs)
+    data_fit[data_fit < 0.0] = 0.0
+    data_fit[data_fit > 1.0] = 1.0
+    return data_fit
+
+def get_topn_case(data_array, n, mode='reduce'):
+    case_index = None
+    if mode == 'reduce':
+        topn_case_index = np.argsort(data_array)[-n:]
+    else:
+        topn_case_index = np.argsort(data_array)[:n]
+    topn_case = data_array[sorted(case_index)]
+    return topn_case, topn_case_index
+
 """
 Function description: 可视化数据
 """
-
-def get_marker_Line2D(ml_color, ml_markersize, ml_label) :
+def plt_add_marker_line2d(ml_label, ml_color, ml_markersize=5) :
     return mlines.Line2D([], [], color=ml_color, marker='.', markersize=ml_markersize, label=ml_label)
 
-def add_legend(plt_figure, handle_ml) :
-    plt_figure.legend(handles=handle_ml)
+def plt_add_title(plt_figure, t_title, t_fontsize=9, t_weight='bold', t_color='red'):
+    t_text = plt_figure.set_title(t_title)
+    plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
     return None
 
-def show_pyplot(plt) :
-    return plt.show()
+def plt_add_xy_title(plt_figure, x_title=u'', y_title=u'',
+                     x_fontsize=10, x_weight='bold', x_color='black',
+                     y_fontsize=10, y_weight='bold', y_color='black'):
+    x_text = plt_figure.set_xlabel(x_title)
+    y_text = plt_figure.set_ylabel(y_title)
+    plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
+    plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
+    return None
 
 def data2plt(plt_figure, data_x, data_y,
-             color_list, point_pixel, point_trans,
-             t_label, t_fontsize, t_weight, t_color,
-             x_label, x_fontsize, x_weight, x_color,
-             y_label, y_fontsize, y_weight, y_color,
-             fontfile_path = '') :
-    if fontfile_path != '' :
-        font = FontProperties(fname=fontfile_path, size=10)
-        plt_figure.scatter(x=data_x, y=data_y, color=color_list,
-                        s=point_pixel, alpha=point_trans)
-        t_text = plt_figure.set_title(t_label, FontProperties=font)
-        x_text = plt_figure.set_xlabel(x_label, FontProperties=font)
-        y_text = plt_figure.set_ylabel(y_label, FontProperties=font)
-        plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
-        plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
-        plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
-    else :
-        plt_figure.scatter(x=data_x, y=data_y, color=color_list,
-                        s=point_pixel, alpha=point_trans)
-        t_text = plt_figure.set_title(t_label)
-        x_text = plt_figure.set_xlabel(x_label)
-        y_text = plt_figure.set_ylabel(y_label)
-        plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
-        plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
-        plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
+             pixel_color, point_pixel, point_trans,
+             t_title, t_fontsize, t_weight, t_color,
+             x_title, x_fontsize, x_weight, x_color,
+             y_title, y_fontsize, y_weight, y_color) :
+    plt_figure.scatter(x=data_x, y=data_y, color=pixel_color,
+                    s=point_pixel, alpha=point_trans)
+    t_text = plt_figure.set_title(t_title)
+    x_text = plt_figure.set_xlabel(x_title)
+    y_text = plt_figure.set_ylabel(y_title)
+    plt.setp(t_text, size=t_fontsize, weight=t_weight, color=t_color)
+    plt.setp(x_text, size=x_fontsize, weight=x_weight, color=x_color)
+    plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
+    return None
+
+def plt_draw2d(plt_figure, data_x, data_y, pixel_color, plt_type='mix',
+               l_label=u'', t_title=u'', x_title=u'', y_title=u'',
+               point_pixel=5, point_trans=0.5, grid=True, legend='right', 
+               t_fontsize=10, t_weight='bold', t_color='red',
+               x_fontsize=10, x_weight='bold', x_color='black',
+               y_fontsize=10, y_weight='bold', y_color='black'):
+    if plt_type == 'scatter':
+        plt_figure.scatter(x=data_x, y=data_y, color=pixel_color, s=point_pixel, alpha=point_trans)
+    elif type(pixel_color) == type(''):
+        if plt_type == 'line':
+            plt_figure.plot(data_x, data_y, pixel_color, label=l_label)
+        elif plt_type == 'mix':
+            plt_figure.scatter(x=data_x, y=data_y, color='orange', s=3*point_pixel, alpha=1.0)
+            plt_figure.plot(data_x, data_y, pixel_color, label=l_label)
+    else:
+        print('algo line only support string for pixel_color')
+
+    plt_add_title(plt_figure, t_title, t_fontsize, t_weight, t_color)
+    plt_add_xy_title(plt_figure, x_title, y_title,
+                     x_fontsize, x_weight, x_color,
+                     y_fontsize, y_weight, y_color)
+
+    plt_figure.grid(grid)
+    if legend != 'none' and l_label != u'' and l_label != [] :
+        if plt_type == 'scatter' and type(l_label) == type([]) and len(l_label[0]) == len(l_label[1]):
+            l_handle = []
+            length = len(l_label[0])
+            for index in range(length):
+                l_handle.append(plt_add_marker_line2d(l_label[0][index], l_label[1][index], t_fontsize))
+            plt_figure.legend(handles=l_handle)
+        if (plt_type == 'line' or plt_type == 'mix') and type(l_label) == type(''):
+            plt_figure.legend(loc='right')
     return None

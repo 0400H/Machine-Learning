@@ -1,3 +1,5 @@
-# dir
+*.pyc
+*.log
 .vscode
-log
+temp*
+__pycache__
