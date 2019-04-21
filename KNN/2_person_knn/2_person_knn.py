@@ -19,7 +19,7 @@ sys.path.append(__ML_PATH__)
 print(__ML_PATH__, __FATHER_PATH__, sep='\n')
 
 from DataTune.datatune import *
-
+from DataTune.logger import info
 
 #%% Function description: 打开并解析文件，对数据进行分类：1:didntLike, 2:smallDoses, 3:largeDoses
 def data_loader(filename, interval, encode) :
@@ -68,12 +68,12 @@ def classify_validation(data_array, label_array, ratio, k):
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
     for i in range(val_ratio_num):
         classify_Result = classify_love(data_norm[i], data_norm, label_array, k)
-        print("correction: %s, { prediction: %s, reality: %s }" % (classify_Result == label_array[i],
-                                                                   labels_dict[classify_Result],
-                                                                   labels_dict[label_array[i]]))
+        info("correction: %s, { prediction: %s, reality: %s }" % (classify_Result == label_array[i],
+                                                                  labels_dict[classify_Result],
+                                                                  labels_dict[label_array[i]]))
         if classify_Result != label_array[i]:
             errorCount += 1.0
-    print("错误率:%f%%" %(errorCount / float(val_ratio_num) * 100))
+    info("错误率:%f%%" %(errorCount / float(val_ratio_num) * 100))
 
 """
 Function description:使用数据集进行分类器测试
@@ -96,7 +96,7 @@ def classify_test(data_array, label_array, K):
 
     #打印结果
     resultList = ['didntLike','smallDoses','largeDoses']
-    print("prediction: %s" % (resultList[classify_Result-1]))
+    info("prediction: %s" % (resultList[classify_Result-1]))
 
 @jit
 def showdatas(data_array, label_array) :

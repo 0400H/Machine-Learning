@@ -19,6 +19,7 @@ sys.path.append(__ML_PATH__)
 print(__ML_PATH__, __FATHER_PATH__, sep='\n')
 
 from DataTune.datatune import *
+from DataTune.logger import info
 from sklearn.neighbors import KNeighborsClassifier as kNN
 
 @jit
@@ -84,10 +85,10 @@ def classify_test(class_classifier):
         testcase = test_data[index]
         label = test_labels[index]
         classify_result = classfier.classify(testcase)
-        print("分类返回结果为%d\t真实结果为%d" % (classify_result, label))
+        info("分类返回结果为%d\t真实结果为%d" % (classify_result, label))
         if (classify_result != label):
             errorCount += 1.0
-    print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/test_num))
+    info("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/test_num))
 
 if __name__ == '__main__':
     classify_test(knn)
