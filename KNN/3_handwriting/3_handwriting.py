@@ -88,7 +88,7 @@ def classify_test(class_classifier):
         info("分类返回结果为%d\t真实结果为%d" % (classify_result, label))
         if (classify_result != label):
             errorCount += 1.0
-    info("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/test_num))
+    info("总共错了%d个数据, 错误率为%f%%" % (errorCount, errorCount/test_num))
 
 if __name__ == '__main__':
     classify_test(knn)
