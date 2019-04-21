@@ -1,5 +1,6 @@
 *.pyc
 *.log
-.vscode
 temp*
+.idea
+.vscode
 __pycache__

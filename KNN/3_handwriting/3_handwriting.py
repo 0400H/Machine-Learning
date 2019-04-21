@@ -1,16 +1,27 @@
 # -*- coding: UTF-8 -*-
 
+#%% Compatible with jupyter
 import os, sys
-__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-__Project_Root__ = os.path.dirname(__Father_Root__ + '../../')
-sys.path.append(__Father_Root__)
-sys.path.append(__Project_Root__)
+try:
+    __FATHER_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+except NameError:
+    try:
+        __FATHER_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+        from DataTune.datatune import *
+    except ModuleNotFoundError:
+        __ML_PATH__ = os.getcwd() + '/'
+        __FATHER_PATH__ = __ML_PATH__ + 'KNN/3_knn/'
+        pass
+    pass
+sys.path.append(__ML_PATH__)
+print(__ML_PATH__, __FATHER_PATH__, sep='\n')
 
 from DataTune.datatune import *
-import numpy as np
-import operator
 from sklearn.neighbors import KNeighborsClassifier as kNN
 
+@jit
 def data_loader(dateset_dir) :
     labels = []
     file_list = os.listdir(dateset_dir)
@@ -28,16 +39,18 @@ def data_loader(dateset_dir) :
 """
 Function description: kNN算法, 分类器
 """
-class handwriting_sklearn(object):
+class knn_sklearn(object):
+    @jit
     def __init__(self, ver_data, ver_labels, K) :
         self._knn_kernel = kNN(n_neighbors = K, algorithm = 'auto')
         self._knn_kernel.fit(ver_data, ver_labels)
         return None
 
+    @jit
     def classify(self, testcase) :
         return self._knn_kernel.predict(testcase.reshape(1, 1024))
 
-class handwriting(object) :
+class knn(object) :
     def __init__(self, ver_data, ver_labels, K) :
         self._ver_num = ver_data.shape[0]
         self._ver_data = ver_data
@@ -45,35 +58,23 @@ class handwriting(object) :
         self._K = K
         return None
 
+    @jit
     def classify(self, testcase) :
-        #create ndarray, shape = (ver_num, 1)
-        test_ndarray = np.tile(testcase, (self._ver_num, 1)) - self._ver_data
-        #平方后元素相加,axis==0列相加,axis==1行相加
-        sq_distances = np.square(test_ndarray).sum(axis=1)
-        #开方,计算出距离
-        distances = np.power(sq_distances, 0.5)
-        #返回distances中元素从小到大排序后的索引值
-        sorted_distances = distances.argsort()
-        #定一个记录类别次数的字典
-        classCount = {}
-        for i in range(self._K):
-            #取出前k个元素的类别
-            label = self._ver_labels[sorted_distances[i]]
-            #计算类别次数， dict.get(key,default=None),字典的get()方法,返回指定键的值,如果值不在字典中返回默认值。
-            classCount[label] = classCount.get(label, 0) + 1
-        #reverse==True降序排序字典, itemgetter(0) 与 itemgetter(1)分别根据字典的键和值进行排序
-        sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
-        # print('label,times:', sortedClassCount)
-        #返回次数最多的类别,即所要分类的类别
-        return sortedClassCount[0][0]
+        l2_distance =  np.power(np.sum(np.square(testcase - self._ver_data), axis = 1), 0.5)
+        topk_index = np.argsort(l2_distance, kind='quicksort')[:self._K]
+        topk_label = [self._ver_labels[index] for index in topk_index]
+        count_common = collect_np(topk_label)
+        top1_label = get_topn(count_common, 1)
+        return top1_label
 
 """
 函数说明: 手写数字分类测试
 """
+@jit
 def classify_test(class_classifier):
     # verification, test
-    ver_data, ver_labels = data_loader(__Father_Root__ + 'trainingDigits')
-    test_data, test_labels = data_loader(__Father_Root__ + 'testDigits')
+    ver_data, ver_labels = data_loader(__FATHER_PATH__ + 'trainingDigits')
+    test_data, test_labels = data_loader(__FATHER_PATH__ + 'testDigits')
 
     classfier = class_classifier(ver_data, ver_labels, 3)
 
@@ -89,5 +90,5 @@ def classify_test(class_classifier):
     print("总共错了%d个数据\n错误率为%f%%" % (errorCount, errorCount/test_num))
 
 if __name__ == '__main__':
-    classify_test(handwriting)
-    classify_test(handwriting_sklearn)
+    classify_test(knn)
+    classify_test(knn_sklearn)

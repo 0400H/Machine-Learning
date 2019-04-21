@@ -1,5 +1,8 @@
 # -*- coding: UTF-8 -*-
 
+import operator
+import collections
+from numba import jit
 import numpy as np
 import numpy.polynomial.polynomial as poly
 import matplotlib.lines as mlines
@@ -10,6 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 """
 Function description: 从文件读取数据到array
 """
+@jit
 def file2array(filename='', jump_out_key=[], enter_key=[], select_key=[], dtype=np.float):
     select_key_length = len(select_key)
     data_list = [[] for i in range(select_key_length)]
@@ -72,12 +76,14 @@ def file2array(filename='', jump_out_key=[], enter_key=[], select_key=[], dtype=
 
     return data_list_array, length_list
 
+@jit
 def file2array1(filename, in_dtype, nop='#', interval='', usecols=None, unpack=False) :
     if (interval == '') :
         return np.loadtxt(filename, dtype=in_dtype, comments=nop)
     else :
         return np.loadtxt(filename, dtype=in_dtype, comments=nop, delimiter=interval)
 
+@jit
 def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
     file2list = open(filename, 'r', encoding = encode).readlines()
     #针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
@@ -96,6 +102,7 @@ def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
 
     return data_array.astype(out_dtype)
 
+@jit
 def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='utf-8'):
     h_length = h_end - h_start
     w_length = w_end - w_start
@@ -107,6 +114,7 @@ def img2col(filename, h_start, h_end, w_start, w_end, out_dtype=np.int, encode='
 
     return img_col.reshape(h_length * w_length)
 
+@jit
 def str2col(string, out_dtype = np.int) :
     length = len(string.strip())
     str_col = np.zeros(shape = (length)).astype(out_dtype)
@@ -114,9 +122,11 @@ def str2col(string, out_dtype = np.int) :
         str_col[index] = string[index]
     return str_col.astype(out_dtype).reshape(length)
 
+@jit
 def data2matrix(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str) :
     return data_array[h_start:h_end, w_start:w_end].astype(out_dtype)
 
+@jit
 def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_row=True) :
     h_length = h_end - h_start
     w_length = w_end - w_start
@@ -130,19 +140,29 @@ def data2col(data_array, h_start, h_end, w_start, w_end, out_dtype=np.str, out_r
 """
 Function description: 数据处理
 """
+def collect_std(data_list=[]):
+    return dict(collections.Counter(data_list))
+
+# @jit
+def collect_np(data_list=[]):
+    return dict(zip(*np.unique(data_list, return_counts=True)))
+
+@jit
 def normalization(data_ndarray) :
-    #获得数据的极值和范围
-    minVals = data_ndarray.min(0)
-    maxVals = data_ndarray.max(0)
+    #获得列数据的极值和范围
+    minVals = data_ndarray.min(axis=0)
+    maxVals = data_ndarray.max(axis=0)
     ranges = maxVals - minVals
-    data_num = data_ndarray.shape[0]
+    line_num = data_ndarray.shape[0]
 
-    data_range = np.tile(ranges, (data_num, 1))
-    data_loss = data_ndarray - np.tile(minVals, (data_num, 1))
+    data_range = np.tile(ranges, (line_num, 1))
+    data_min = np.tile(minVals, (line_num, 1))
+    data_loss = data_ndarray - data_min
 
-    resault = data_loss / data_range
-    return resault, ranges, minVals
+    result = data_loss / data_range
+    return result, ranges, minVals
 
+@jit
 def standardization(data_ndarray) :
     meanVals = data_ndarray.mean(0)
     data_num = data_ndarray.shape[0]
@@ -153,6 +173,7 @@ def standardization(data_ndarray) :
     resault = (data_ndarray - data_mean) / data_std
     return resault
 
+@jit
 def outlier_process(data_array, length, gamma):
     data_mean = np.mean(data_array[:length])
     data_std = np.std(data_array[:length])
@@ -162,6 +183,7 @@ def outlier_process(data_array, length, gamma):
             data_array[index] = data_array[index-1]
     return None
 
+@jit
 def auto_fit(data_x, data_y, start, end, degree):
     # Polynomial fitting
     coefs = poly.polyfit(data_x[start:end], data_y[start:end], degree)
@@ -170,6 +192,21 @@ def auto_fit(data_x, data_y, start, end, degree):
     data_fit[data_fit > 1.0] = 1.0
     return data_fit
 
+def get_topn(data_dict, n, mode='reduce'):
+    topn = None
+    if n == 1:
+        if mode == 'reduce':
+            topn = max(data_dict, key=data_dict.get)
+        else:
+            topn = min(data_dict, key=data_dict.get)
+    else:
+        if mode == 'reduce':
+            topn = sorted(data_dict.items(), key=operator.itemgetter(1), reverse=True)[:n]
+        else:
+            topn = sorted(data_dict.items(), key=operator.itemgetter(1), reverse=False)[:n]
+    return topn
+
+@jit
 def get_topn_case(data_array, n, mode='reduce'):
     case_index = None
     if mode == 'reduce':
@@ -178,6 +215,7 @@ def get_topn_case(data_array, n, mode='reduce'):
         topn_case_index = np.argsort(data_array)[:n]
     topn_case = data_array[sorted(case_index)]
     return topn_case, topn_case_index
+
 
 """
 Function description: 可视化数据
@@ -214,9 +252,10 @@ def data2plt(plt_figure, data_x, data_y,
     plt.setp(y_text, size=y_fontsize, weight=y_weight, color=y_color)
     return None
 
+@jit
 def plt_draw2d(plt_figure, data_x, data_y, pixel_color, plt_type='mix',
                l_label=u'', t_title=u'', x_title=u'', y_title=u'',
-               point_pixel=5, point_trans=0.5, grid=True, legend='right', 
+               point_pixel=5, point_trans=0.5, grid=False, legend='right', 
                t_fontsize=10, t_weight='bold', t_color='red',
                x_fontsize=10, x_weight='bold', x_color='black',
                y_fontsize=10, y_weight='bold', y_color='black'):
