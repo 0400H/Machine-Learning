@@ -15,15 +15,18 @@ except NameError:
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
         pass
     pass
+__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
-print(__ML_PATH__, __FATHER_PATH__, sep='\n')
+sys.path.append(__ALGO_PATH__)
+print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
 
+from knn import *
 from DataTune.datatune import *
-
+from DataTune.logger import info
 
 # %% Function description: read data_array, labels from csv
 @jit
-def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim) :
+def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim):
     (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
     data_array = file2array1(filename, np.str, nop, interval)
     data = data2matrix(data_array, h_start, h_end, w_start, w_end, np.float)
@@ -53,8 +56,12 @@ def classify_easy_knn(testcase, val_dataset, val_labels, k):
 #%%
 if __name__ == '__main__':
     val_data, val_labels = data_loader(__FATHER_PATH__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
-    test_dataset = [(3, 11), (31, 42), (79, 80)]
+    test_dataset = np.array([[3, 11], [31, 42], [79, 80]])
 
-    for testcase in test_dataset :
-        classify_class = classify_easy_knn(testcase, val_data, val_labels, 3)
-        print(testcase, ': ', classify_class)
+    classfier_1 = knn(val_data, val_labels, 3)
+    classfier_2 = knn_sklearn(val_data, val_labels, 3)
+
+    for testcase in test_dataset:
+        category_1 = classfier_1.classify(testcase)
+        category_2 = classfier_2.classify(testcase)
+        print(testcase, ': ', category_1, category_2[0])

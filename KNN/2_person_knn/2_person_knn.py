@@ -15,9 +15,12 @@ except NameError:
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/2_person_knn/'
         pass
     pass
+__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
-print(__ML_PATH__, __FATHER_PATH__, sep='\n')
+sys.path.append(__ALGO_PATH__)
+print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
 
+from knn import *
 from DataTune.datatune import *
 from DataTune.logger import info
 
@@ -33,41 +36,23 @@ def data_loader(filename, interval, encode) :
     return data_array, labels_list
 
 """
-Function description: kNN算法, 分类器
-Parameters:
-    inX     - 用于分类的数据(测试集)
-    dataSet - 用于训练的数据(训练集)
-    labes   - 分类标签
-    k       - kNN算法参数,选择距离最小的k个点
-Returns:
-    sortedClassCount[0][0] - 分类结果
-"""
-@jit
-def classify_love(inX, dataSet, labels, k):
-    loss = inX - dataSet
-    l2_distance = np.power(np.square(loss).sum(axis=1), 0.5)
-    topk_index = l2_distance.argsort(kind='quicksort')[:k]
-    topk_label = [labels[index] for index in topk_index]
-    count_common = collect_np(topk_label)
-    top1_label = get_topn(count_common, 1)
-    return top1_label
-
-"""
 Function description: 使用数据集进行分类器验证
 """
 @jit
 def classify_validation(data_array, label_array, ratio, k):
-    #数据归一化,返回归一化后的矩阵,数据范围,数据最小值
+    # 返回归一化后的矩阵,数据范围,数据最小值
     data_norm, _, _ = normalization(data_array)
 
-    #获得data_norm的行数, 百分之十的测试数据的个数
+    # 获得data_norm的行数, 百分之十的测试数据的个数
     val_ratio_num = int(data_array.shape[0] * ratio)
 
-    #分类错误计数
+    # 分类错误计数
     errorCount = 0.0
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
+
+    classfier = knn(data_norm, label_array, k)
     for i in range(val_ratio_num):
-        classify_Result = classify_love(data_norm[i], data_norm, label_array, k)
+        classify_Result = classfier.classify(data_norm[i])
         info("correction: %s, { prediction: %s, reality: %s }" % (classify_Result == label_array[i],
                                                                   labels_dict[classify_Result],
                                                                   labels_dict[label_array[i]]))
@@ -79,28 +64,29 @@ def classify_validation(data_array, label_array, ratio, k):
 Function description:使用数据集进行分类器测试
 """
 @jit
-def classify_test(data_array, label_array, K):
-    #训练集归一化
+def classify_test(data_array, label_array, k):
+    # 返回归一化后的矩阵,数据范围,数据最小值
     data_norm, ranges, minVals = normalization(data_array)
 
-    #三维特征用户输入
+    # 三维特征用户输入
     precentTats = float(input("hobby1 times:"))
     ffMiles = float(input("hobby2 times:"))
     iceCream = float(input("hobby3 times:"))
-    #生成NumPy数组,测试集
-    inArr = np.array([ffMiles, precentTats, iceCream])
-    #测试集归一化
-    norminArr = (inArr - minVals) / ranges
-    #返回分类结果
-    classify_Result = classify_love(norminArr, data_norm, label_array, K)
 
-    #打印结果
+    # 测试集归一化
+    inArr = np.array([ffMiles, precentTats, iceCream])
+    norminArr = (inArr - minVals) / ranges
+
+    # 返回分类结果
+    classfier = knn(data_norm, label_array, k)
+    classify_Result = classfier.classify(norminArr)
+
     resultList = ['didntLike','smallDoses','largeDoses']
     info("prediction: %s" % (resultList[classify_Result-1]))
 
 @jit
 def showdatas(data_array, label_array) :
-    #将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
+    # 将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
     canvas, figure = plt.subplots(nrows=2, ncols=2,sharex=False, sharey=False, figsize=(13, 8))
 
     Legends = [['didntLike', 'smallDoses', 'largeDoses'], ['black', 'orange', 'red']]

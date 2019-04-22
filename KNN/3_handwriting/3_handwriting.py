@@ -15,15 +15,17 @@ except NameError:
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/3_knn/'
         pass
     pass
+__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
-print(__ML_PATH__, __FATHER_PATH__, sep='\n')
+sys.path.append(__ALGO_PATH__)
+print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
 
+from knn import *
 from DataTune.datatune import *
 from DataTune.logger import info
-from sklearn.neighbors import KNeighborsClassifier as kNN
 
 @jit
-def data_loader(dateset_dir) :
+def data_loader(dateset_dir):
     labels = []
     file_list = os.listdir(dateset_dir)
     case_num = len(file_list)
@@ -38,37 +40,6 @@ def data_loader(dateset_dir) :
     return data_array, labels
 
 """
-Function description: kNN算法, 分类器
-"""
-class knn_sklearn(object):
-    @jit
-    def __init__(self, ver_data, ver_labels, K) :
-        self._knn_kernel = kNN(n_neighbors = K, algorithm = 'auto')
-        self._knn_kernel.fit(ver_data, ver_labels)
-        return None
-
-    @jit
-    def classify(self, testcase) :
-        return self._knn_kernel.predict(testcase.reshape(1, 1024))
-
-class knn(object) :
-    def __init__(self, ver_data, ver_labels, K) :
-        self._ver_num = ver_data.shape[0]
-        self._ver_data = ver_data
-        self._ver_labels = ver_labels
-        self._K = K
-        return None
-
-    @jit
-    def classify(self, testcase) :
-        l2_distance =  np.power(np.sum(np.square(testcase - self._ver_data), axis = 1), 0.5)
-        topk_index = np.argsort(l2_distance, kind='quicksort')[:self._K]
-        topk_label = [self._ver_labels[index] for index in topk_index]
-        count_common = collect_np(topk_label)
-        top1_label = get_topn(count_common, 1)
-        return top1_label
-
-"""
 函数说明: 手写数字分类测试
 """
 @jit
@@ -81,7 +52,7 @@ def classify_test(class_classifier):
 
     errorCount = 0.0
     test_num = len(test_labels)
-    for index in range(test_num) :
+    for index in range(test_num):
         testcase = test_data[index]
         label = test_labels[index]
         classify_result = classfier.classify(testcase)

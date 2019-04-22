@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+#-*- coding: UTF-8 -*-
 
 import operator
 import collections
@@ -85,18 +85,18 @@ def file2array1(filename, in_dtype, nop='#', interval='', usecols=None, unpack=F
 
 @jit
 def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
-    file2list = open(filename, 'r', encoding = encode).readlines()
-    #针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
+    file2list = open(filename, 'r', encoding=encode).readlines()
+    # 针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
     file2list[0] = file2list[0].lstrip('\ufeff')
-    #得到文件行数,列数, 创建合适的 NumPy 矩阵
+    # 得到文件行数,列数, 创建合适的 NumPy 矩阵
     data_num = len(file2list)
-    num_of_column = len(file2list[0]) if interval == '' else file2list[0].count(interval) + 1
+    num_of_column = (len(file2list[0]), file2list[0].count(interval) + 1)[interval != '']
     data_array = np.zeros((data_num, num_of_column)).astype(out_dtype)
 
     index = 0
     for line in file2list :
-        #s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
-        line2list = line.strip() if interval == '' else line.strip().split(interval)
+        # s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
+        line2list = (line.strip(), line.strip().split(interval))[interval == '']
         data_array[index] = np.array(line2list)
         index += 1
 
@@ -143,13 +143,13 @@ Function description: 数据处理
 def collect_std(data_list=[]):
     return dict(collections.Counter(data_list))
 
-# @jit
+@jit
 def collect_np(data_list=[]):
     return dict(zip(*np.unique(data_list, return_counts=True)))
 
 @jit
 def normalization(data_ndarray) :
-    #获得列数据的极值和范围
+    # 获得列数据的极值和范围
     minVals = data_ndarray.min(axis=0)
     maxVals = data_ndarray.max(axis=0)
     ranges = maxVals - minVals
