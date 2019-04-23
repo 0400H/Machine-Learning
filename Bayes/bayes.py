@@ -9,7 +9,7 @@ except NameError:
     try:
         __FATHER_PATH__ = os.getcwd() + '/'
         __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../')
-        from DataTune.datatune import *
+        from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
         __FATHER_PATH__ = __ML_PATH__ + 'Bayes/'
@@ -18,85 +18,44 @@ except NameError:
 sys.path.append(__ML_PATH__)
 print(__ML_PATH__, __FATHER_PATH__, sep='\n')
 
-from DataTune.datatune import *
+from Tuning.datatune import *
 from functools import reduce
 
 #%%
-"""
-函数说明:创建实验样本
-
-Parameters:
-    无
-Returns:
-    postingList - 实验样本切分的词条
-    classVec - 类别标签向量
-Author:
-    Jack Cui
-Blog:
-    http://blog.csdn.net/c406495762
-Modify:
-    2017-08-11
-"""
-def loadDataSet():
-    postingList=[['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],                #切分的词条
+# 二分类
+def DataLoader():
+    entry_list=[['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],
                 ['maybe', 'not', 'take', 'him', 'to', 'dog', 'park', 'stupid'],
                 ['my', 'dalmation', 'is', 'so', 'cute', 'I', 'love', 'him'],
                 ['stop', 'posting', 'stupid', 'worthless', 'garbage'],
                 ['mr', 'licks', 'ate', 'my', 'steak', 'how', 'to', 'stop', 'him'],
                 ['quit', 'buying', 'worthless', 'dog', 'food', 'stupid']]
-    classVec = [0,1,0,1,0,1]                                                                   #类别标签向量，1代表侮辱性词汇，0代表不是
-    return postingList,classVec                                                                #返回实验样本切分的词条和类别标签向量
+    class_vector = [0, 1, 0, 1, 0, 1]
+    return entry_list, class_vector
 
-"""
-函数说明:将切分的实验样本词条整理成不重复的词条列表，也就是词汇表
+def EntryList2WordList(entry_list):
+    word_set = set([])
+    for entry in entry_list:
+        word_set = word_set | set(entry)
+    return list(word_set)
 
-Parameters:
-    dataSet - 整理的样本数据集
-Returns:
-    vocabSet - 返回不重复的词条列表，也就是词汇表
-Author:
-    Jack Cui
-Blog:
-    http://blog.csdn.net/c406495762
-Modify:
-    2017-08-11
-"""
-def createVocabList(dataSet):
-    vocabSet = set([])                      #创建一个空的不重复列表
-    for document in dataSet:                
-        vocabSet = vocabSet | set(document) #取并集
-    return list(vocabSet)
 
-"""
-函数说明:根据vocabList词汇表，将inputSet向量化，向量的每个元素为1或0
-
-Parameters:
-    vocabList - createVocabList返回的列表
-    inputSet - 切分的词条列表
-Returns:
-    returnVec - 文档向量,词集模型
-Author:
-    Jack Cui
-Blog:
-    http://blog.csdn.net/c406495762
-Modify:
-    2017-08-11
-"""
-def setOfWords2Vec(vocabList, inputSet):
-    returnVec = [0] * len(vocabList)                                    #创建一个其中所含元素都为0的向量
-    for word in inputSet:                                                #遍历每个词条
-        if word in vocabList:                                            #如果词条存在于词汇表中，则置1
-            returnVec[vocabList.index(word)] = 1
-        else: print("the word: %s is not in my Vocabulary!" % word)
-    return returnVec                                                    #返回文档向量
+# 函数说明: 使用词汇表的mask(0 or 1)表示词条
+def Entry2WordListMask(word_list, entry):
+    word_list_mask = [0 for i in range(len(word_list))]
+    for word in entry:
+        if word in word_list:
+            word_list_mask[word_list.index(word)] = 1
+        else: print("the word: %s is not in my Wordulary!" % word)
+    return word_list_mask
 
 
 """
 函数说明:朴素贝叶斯分类器训练函数
 
 Parameters:
-    trainMatrix - 训练文档矩阵，即setOfWords2Vec返回的returnVec构成的矩阵
-    trainCategory - 训练类别标签向量，即loadDataSet返回的classVec
+    trainMatrix - 训练文档矩阵，即Entry2WordListMask返回的word_list_mask构成的矩阵
+    trainCategory - 训练类别标签向量，即DataLoader返回的classVec
 Returns:
     p0Vect - 非的条件概率数组
     p1Vect - 侮辱类的条件概率数组
@@ -109,11 +68,12 @@ Modify:
     2017-08-12
 """
 @jit
-def trainNB0(trainMatrix,trainCategory):
+def trainNB0(trainMatrix, trainCategory):
     numTrainDocs = len(trainMatrix)                            #计算训练的文档数目
     numWords = len(trainMatrix[0])                            #计算每篇文档的词条数
     pAbusive = sum(trainCategory)/float(numTrainDocs)        #文档属于侮辱类的概率
-    p0Num = np.zeros(numWords); p1Num = np.zeros(numWords)    #创建numpy.zeros数组,
+    p0Num = np.zeros(numWords)
+    p1Num = np.zeros(numWords)    #创建numpy.zeros数组,
     p0Denom = 0.0; p1Denom = 0.0                            #分母初始化为0.0
     for i in range(numTrainDocs):
         if trainCategory[i] == 1:                            #统计属于侮辱类的条件概率所需的数据，即P(w0|1),P(w1|1),P(w2|1)···
@@ -124,7 +84,7 @@ def trainNB0(trainMatrix,trainCategory):
             p0Denom += sum(trainMatrix[i])
     p1Vect = p1Num/p1Denom                                    #相除        
     p0Vect = p0Num/p0Denom          
-    return p0Vect,p1Vect,pAbusive                            #返回属于侮辱类的条件概率数组，属于非侮辱类的条件概率数组，文档属于侮辱类的概率
+    return p0Vect,p1Vect,pAbusive                            #返回属于侮辱类条件的单词概率数组，属于非侮辱类条件的单词概率数组，文档属于侮辱类的概率
 
 """
 函数说明:朴素贝叶斯分类器分类函数
@@ -168,23 +128,25 @@ Blog:
 Modify:
     2017-08-12
 """
-@jit
+# @jit
 def testingNB():
-    listOPosts,listClasses = loadDataSet()                                    #创建实验样本
-    myVocabList = createVocabList(listOPosts)                                #创建词汇表
+    listOPosts,listClasses = DataLoader()                                    #创建实验样本
+    myWordList = EntryList2WordList(listOPosts)                                #创建词汇表
     trainMat=[]
     for postinDoc in listOPosts:
-        trainMat.append(setOfWords2Vec(myVocabList, postinDoc))                #将实验样本向量化
-    p0V,p1V,pAb = trainNB0(np.array(trainMat),np.array(listClasses))        #训练朴素贝叶斯分类器
+        trainMat.append(Entry2WordListMask(myWordList, postinDoc))                #将实验样本向量化
+    A = np.array(trainMat)
+    B = np.array(listClasses)
+    p0V,p1V,pAb = trainNB0(A, B)        #训练朴素贝叶斯分类器
     testEntry = ['love', 'my', 'dalmation']                                    #测试样本1
-    thisDoc = np.array(setOfWords2Vec(myVocabList, testEntry))                #测试样本向量化
+    thisDoc = np.array(Entry2WordListMask(myWordList, testEntry))                #测试样本向量化
     if classifyNB(thisDoc,p0V,p1V,pAb):
         print(testEntry,'属于侮辱类')                                        #执行分类并打印分类结果
     else:
         print(testEntry,'属于非侮辱类')                                        #执行分类并打印分类结果
     testEntry = ['stupid', 'garbage']                                        #测试样本2
 
-    thisDoc = np.array(setOfWords2Vec(myVocabList, testEntry))                #测试样本向量化
+    thisDoc = np.array(Entry2WordListMask(myWordList, testEntry))                #测试样本向量化
     if classifyNB(thisDoc,p0V,p1V,pAb):
         print(testEntry,'属于侮辱类')                                        #执行分类并打印分类结果
     else:

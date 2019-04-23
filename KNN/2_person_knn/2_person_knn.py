@@ -9,7 +9,7 @@ except NameError:
     try:
         __FATHER_PATH__ = os.getcwd() + '/'
         __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
-        from DataTune.datatune import *
+        from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/2_person_knn/'
@@ -21,8 +21,8 @@ sys.path.append(__ALGO_PATH__)
 print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
 
 from knn import *
-from DataTune.datatune import *
-from DataTune.logger import info
+from Tuning.datatune import *
+from Tuning.logger import info
 
 #%% Function description: 打开并解析文件，对数据进行分类：1:didntLike, 2:smallDoses, 3:largeDoses
 def data_loader(filename, interval, encode) :

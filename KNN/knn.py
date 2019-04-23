@@ -9,7 +9,7 @@ except NameError:
     try:
         __FATHER_PATH__ = os.getcwd() + '/'
         __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../')
-        from DataTune.datatune import *
+        from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/'
@@ -18,7 +18,7 @@ except NameError:
 sys.path.append(__ML_PATH__)
 sys.path.append(__FATHER_PATH__)
 
-from DataTune.datatune import *
+from Tuning.datatune import *
 from sklearn.neighbors import KNeighborsClassifier as kNN
 
 """

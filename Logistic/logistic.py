@@ -6,7 +6,7 @@ __Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../')
 path.append(__Project_Root__)
 
-from DataTune.datatune import *
+from Tuning.datatune import *
 import matplotlib.pyplot as plt
 import numpy as np
 

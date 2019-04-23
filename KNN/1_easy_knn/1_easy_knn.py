@@ -9,7 +9,7 @@ except NameError:
     try:
         __FATHER_PATH__ = os.getcwd() + '/'
         __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
-        from DataTune.datatune import *
+        from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
         __FATHER_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
@@ -21,8 +21,8 @@ sys.path.append(__ALGO_PATH__)
 print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
 
 from knn import *
-from DataTune.datatune import *
-from DataTune.logger import info
+from Tuning.datatune import *
+from Tuning.logger import info
 
 # %% Function description: read data_array, labels from csv
 @jit

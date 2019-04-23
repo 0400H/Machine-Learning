@@ -10,7 +10,7 @@ class estimate_numpy (object) :
         data_list = []
         with open(filename, 'r', encoding='utf-8') as fp:
             for line in fp.readlines():
-                if ((keyword != '') and (line.find(keyword) != -1)):
+                if ((keyword != '') and (line.find(keyword) != None)):
                     string_index = line.index(keyword) + len(keyword)
                     string = str(line[string_index: ]).strip('\n').strip('ms.')
                     data_list.append(float(string))
@@ -23,35 +23,35 @@ class estimate_numpy (object) :
     def get_mean_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
-            return -1
+            return None
         else :
             return np.sum(data_array[:length]) / length
 
     def get_max_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
-            return -1
+            return None
         else :
             return np.max(data_array[:length])
 
     def get_min_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
-            return -1
+            return None
         else :
             return np.min(data_array[:length])
 
     def get_sq_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
-            return -1
+            return None
         else :
             return np.var(data_array[:length])
 
     def get_std_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
-            return -1
+            return None
         else :
             return np.std(data_array[:length])
 

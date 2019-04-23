@@ -5,7 +5,7 @@ __Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
 __Project_Root__ = os.path.dirname(__Father_Root__ + '../')
 sys.path.append(__Project_Root__)
 
-from DataTune.datatune import *
+from Tuning.datatune import *
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 import random

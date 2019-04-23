@@ -96,7 +96,8 @@ def file2array2(filename, out_dtype=np.str, interval='', encode='utf-8') :
     index = 0
     for line in file2list :
         # s.strip(rm)，当rm空时,默认删除空白符(包括'\n','\r','\t',' ')
-        line2list = (line.strip(), line.strip().split(interval))[interval == '']
+        line = line.strip()
+        line2list = (line, line.split(interval))[interval != '']
         data_array[index] = np.array(line2list)
         index += 1
 
