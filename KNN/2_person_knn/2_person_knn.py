@@ -50,9 +50,9 @@ def classify_validation(data_array, label_array, ratio, k):
     errorCount = 0.0
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
 
-    classfier = knn(data_norm, label_array, k)
+    classifier = knn(data_norm, label_array, k)
     for i in range(val_ratio_num):
-        classify_Result = classfier.classify(data_norm[i])
+        classify_Result = classifier.classify(data_norm[i])
         info("correction: %s, { prediction: %s, reality: %s }" % (classify_Result == label_array[i],
                                                                   labels_dict[classify_Result],
                                                                   labels_dict[label_array[i]]))
@@ -78,8 +78,8 @@ def classify_test(data_array, label_array, k):
     norminArr = (inArr - minVals) / ranges
 
     # 返回分类结果
-    classfier = knn(data_norm, label_array, k)
-    classify_Result = classfier.classify(norminArr)
+    classifier = knn(data_norm, label_array, k)
+    classify_Result = classifier.classify(norminArr)
 
     resultList = ['didntLike','smallDoses','largeDoses']
     info("prediction: %s" % (resultList[classify_Result-1]))

@@ -48,14 +48,14 @@ def classify_test(class_classifier):
     ver_data, ver_labels = data_loader(__FATHER_PATH__ + 'trainingDigits')
     test_data, test_labels = data_loader(__FATHER_PATH__ + 'testDigits')
 
-    classfier = class_classifier(ver_data, ver_labels, 3)
+    classifier = class_classifier(ver_data, ver_labels, 3)
 
     errorCount = 0.0
     test_num = len(test_labels)
     for index in range(test_num):
         testcase = test_data[index]
         label = test_labels[index]
-        classify_result = classfier.classify(testcase)
+        classify_result = classifier.classify(testcase)
         info("分类返回结果为%d\t真实结果为%d" % (classify_result, label))
         if (classify_result != label):
             errorCount += 1.0

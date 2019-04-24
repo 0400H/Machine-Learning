@@ -21,9 +21,16 @@ sys.path.append(__FATHER_PATH__)
 from Tuning.datatune import *
 from sklearn.neighbors import KNeighborsClassifier as kNN
 
-"""
-Function description: kNN算法, 分类器
-"""
+'''
+    函数说明: KNN分类器
+    Parameters:
+        testcase     - 用于分类的测试用例
+        val_dataset  - 用于验证的数据
+        labes        - 用于验证的标签
+        k            - 选择距离最小的k个点
+    Returns:
+        top1_label   - 分类结果
+'''
 class knn_sklearn(object):
     @jit
     def __init__(self, ver_data, ver_labels, k) :
@@ -46,6 +53,7 @@ class knn(object) :
 
     @jit
     def classify(self, testcase) :
+        # axis==0行相加,axis==1列相加
         l2_distance =  np.power(np.sum(np.square(testcase - self._ver_data), axis = 1), 0.5)
         topk_index = np.argsort(l2_distance, kind='quicksort')[:self._K]
         topk_label = [self._ver_labels[index] for index in topk_index]
