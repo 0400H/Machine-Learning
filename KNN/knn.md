@@ -14,7 +14,7 @@ step 2|find out the top k minmum of every l2-distance and it's corresponding lab
 step 3|find out largest number of duplicate label in top k labels
 step 4|we get it
 #
-Algorithm evaluation|h testcase
+Algorithm evaluation|complexity
 :--|:--
 time complexity|O( 8 * h * m * n )
 Space complexity|O( (m + h) * n )
