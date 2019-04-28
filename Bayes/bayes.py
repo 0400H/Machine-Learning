@@ -68,31 +68,26 @@ class native_bayes(object):
     def __init__(self, data_mask_list, class_vector, laplace_smooth=True):
         entry_num = len(data_mask_list)
         self.p_1_entry = sum(class_vector)/float(entry_num)
-        self.laplace = (0, 1)[laplace_smooth]
 
-        class_0_mask_sum, class_1_mask_sum = 0.0, 0.0
-        class_0_mask_list_sum, class_1_mask_list_sum = 0.0, 0.0
+        laplace = (0, 1)[laplace_smooth]
+        class_0_mask_list_sum = laplace
+        class_1_mask_list_sum = laplace
 
-        class_0_mask_list_sum += self.laplace
-        class_1_mask_list_sum += self.laplace
         for i in range(entry_num):
             if class_vector[i] == 1:
                 class_1_mask_list_sum += data_mask_list[i]
-                class_1_mask_sum += sum(data_mask_list[i])
             else:
                 class_0_mask_list_sum += data_mask_list[i]
-                class_0_mask_sum += sum(data_mask_list[i])
+        class_0_mask_sum = sum(class_0_mask_list_sum)
+        class_1_mask_sum = sum(class_1_mask_list_sum)
         self.p_word_0 = class_0_mask_list_sum / class_0_mask_sum
         self.p_word_1 = class_1_mask_list_sum / class_1_mask_sum
         return None
 
     def classify(self, entry, with_log = False):
-        p_entry_mask_0 = entry * self.p_word_0
-        p_entry_mask_1 = entry * self.p_word_1
-
-        # 只保留entry存在的word的概率
-        p_entry_mask_0 = p_entry_mask_0[p_entry_mask_0 > 0]
-        p_entry_mask_1 = p_entry_mask_1[p_entry_mask_1 > 0]
+        # # 只保留entry存在的word的概率
+        p_entry_mask_0 = self.p_word_0[entry > 0]
+        p_entry_mask_1 = self.p_word_1[entry > 0]
 
         if with_log == False:
             p_entry_mask_0 = np.log(p_entry_mask_0)
@@ -104,6 +99,7 @@ class native_bayes(object):
             p_1_entry = reduce(lambda x1,x2: x1*x2, p_entry_mask_1) * self.p_1_entry
             p_0_entry = reduce(lambda x1,x2: x1*x2, p_entry_mask_0) * (1.0 - self.p_1_entry)
 
+        # info(p_0_entry, p_1_entry)
         return (0, 1)[p_1_entry > p_0_entry]
 
 pass
@@ -156,9 +152,9 @@ def native_bayes_test(test_entry_list, with_log):
 if __name__ == '__main__':
     test_entry_list = [
         ['love', 'my', 'dalmation'],
-        ['stupid', 'garbage'],
+        ['stupid', 'garbage', 'dog'],
         ['love', 'my', 'dalmation', 'stupid'],
-        ['love', 'my', 'dalmation', 'stupid', 'garbage'],
+        ['love', 'my', 'dalmation', 'stupid', 'garbage', 'dog'],
     ]
     native_bayes_val(True)
     native_bayes_test(test_entry_list, True)
