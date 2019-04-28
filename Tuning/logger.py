@@ -13,8 +13,7 @@ def get_pid() :
     return str(os.getpid())
 
 def info(*args) :
-    print('[ {} | {} ]'.format(get_time(), get_pid()), end=' ')
-    print(*args, end='\n')
+    print('[ {} | {} ]'.format(get_time(), get_pid()), *args)
     return None
 
 def catch_error(function):
