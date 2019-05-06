@@ -3,22 +3,22 @@
 #%% Compatible with jupyter
 import os, sys
 try:
-    __FATHER_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-    __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
 except NameError:
     try:
-        __FATHER_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+        __F_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
         from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
-        __FATHER_PATH__ = __ML_PATH__ + 'KNN/2_person_knn/'
+        __F_PATH__ = __ML_PATH__ + 'KNN/2_person_knn/'
         pass
     pass
 __ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
 sys.path.append(__ALGO_PATH__)
-print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
+print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')
 
 from knn import *
 from Tuning.datatune import *
@@ -108,7 +108,7 @@ def showdatas(data_array, label_array) :
 
 #%%
 if __name__ == '__main__':
-    datasetcsv = __FATHER_PATH__ + "datingTestSet.csv"
+    datasetcsv = __F_PATH__ + "datingTestSet.csv"
     data_array, label_array = data_loader(datasetcsv, '\t', 'utf-8')
     showdatas(data_array, label_array)
     classify_validation(data_array, label_array, 0.1, 20)

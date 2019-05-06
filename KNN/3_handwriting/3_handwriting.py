@@ -3,22 +3,22 @@
 #%% Compatible with jupyter
 import os, sys
 try:
-    __FATHER_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-    __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
 except NameError:
     try:
-        __FATHER_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+        __F_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
         from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
-        __FATHER_PATH__ = __ML_PATH__ + 'KNN/3_knn/'
+        __F_PATH__ = __ML_PATH__ + 'KNN/3_knn/'
         pass
     pass
 __ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
 sys.path.append(__ALGO_PATH__)
-print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
+print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')
 
 from knn import *
 from Tuning.datatune import *
@@ -45,8 +45,8 @@ def data_loader(dateset_dir):
 @jit
 def classify_test(class_classifier):
     # verification, test
-    ver_data, ver_labels = data_loader(__FATHER_PATH__ + 'trainingDigits')
-    test_data, test_labels = data_loader(__FATHER_PATH__ + 'testDigits')
+    ver_data, ver_labels = data_loader(__F_PATH__ + 'trainingDigits')
+    test_data, test_labels = data_loader(__F_PATH__ + 'testDigits')
 
     classifier = class_classifier(ver_data, ver_labels, 3)
 

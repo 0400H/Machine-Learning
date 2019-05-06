@@ -1,4 +1,25 @@
 # -*- coding: UTF-8 -*-
+
+#%% Compatible with jupyter
+import os, sys
+try:
+    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
+except NameError:
+    try:
+        __F_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
+        from Tuning.datatune import *
+    except ModuleNotFoundError:
+        __ML_PATH__ = os.getcwd() + '/'
+        __F_PATH__ = __ML_PATH__ + 'Bayes/2_bag_of_words/'
+        pass
+    pass
+__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/Bayes')
+sys.path.append(__ML_PATH__)
+sys.path.append(__ALGO_PATH__)
+print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')
+
 import numpy as np
 import random
 import re
@@ -165,11 +186,11 @@ Modify:
 def spamTest():
     docList = []; classList = []; fullText = []
     for i in range(1, 26):                                                  #遍历25个txt文件
-        wordList = textParse(open('email/spam/%d.txt' % i, 'r').read())     #读取每个垃圾邮件，并字符串转换成字符串列表
+        wordList = textParse(open('./email/spam/%d.txt' % i, 'r').read())     #读取每个垃圾邮件，并字符串转换成字符串列表
         docList.append(wordList)
         fullText.append(wordList)
         classList.append(1)                                                 #标记垃圾邮件，1表示垃圾文件
-        wordList = textParse(open('email/ham/%d.txt' % i, 'r').read())      #读取每个非垃圾邮件，并字符串转换成字符串列表
+        wordList = textParse(open('./email/ham/%d.txt' % i, 'r').read())      #读取每个非垃圾邮件，并字符串转换成字符串列表
         docList.append(wordList)
         fullText.append(wordList)
         classList.append(0)                                                 #标记非垃圾邮件，1表示垃圾文件    

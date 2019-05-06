@@ -3,20 +3,19 @@
 #%% Compatible with jupyter
 import os, sys
 try:
-    __FATHER_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-    __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../')
+    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../')
 except NameError:
     try:
-        __FATHER_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../')
+        __F_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../')
         from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
-        __FATHER_PATH__ = __ML_PATH__ + 'Bayes/'
+        __F_PATH__ = __ML_PATH__ + 'Bayes/'
         pass
     pass
 sys.path.append(__ML_PATH__)
-print(__ML_PATH__, __FATHER_PATH__, sep='\n')
 
 from Tuning.datatune import *
 from Tuning.logger import info

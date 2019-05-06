@@ -3,22 +3,22 @@
 #%% Compatible with jupyter
 import os, sys
 try:
-    __FATHER_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-    __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
 except NameError:
     try:
-        __FATHER_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__FATHER_PATH__ + '../../')
+        __F_PATH__ = os.getcwd() + '/'
+        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
         from Tuning.datatune import *
     except ModuleNotFoundError:
         __ML_PATH__ = os.getcwd() + '/'
-        __FATHER_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
+        __F_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
         pass
     pass
 __ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
 sys.path.append(__ML_PATH__)
 sys.path.append(__ALGO_PATH__)
-print(__ML_PATH__, __ALGO_PATH__, __FATHER_PATH__, sep='\n')
+print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')
 
 from knn import *
 from Tuning.datatune import *
@@ -36,7 +36,7 @@ def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim):
 
 #%%
 if __name__ == '__main__':
-    val_data, val_labels = data_loader(__FATHER_PATH__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
+    val_data, val_labels = data_loader(__F_PATH__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
     test_dataset = np.array([[3, 11], [31, 42], [79, 80]])
 
     classifier_1 = knn(val_data, val_labels, 3)
