@@ -2,20 +2,17 @@
 
 #%% Compatible with jupyter
 import os, sys
+
 try:
-    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.getcwd() + '/'
+    __F_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
+    sys.path.append(__ML_PATH__)
+    from Tuning.datatune import *
+except ModuleNotFoundError:
+    __F_PATH__ = os.getcwd() + '/'
     __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
-except NameError:
-    try:
-        __F_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../../')
-        from Tuning.datatune import *
-    except ModuleNotFoundError:
-        __ML_PATH__ = os.getcwd() + '/'
-        __F_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
-        pass
     pass
-__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/KNN')
+__ALGO_PATH__ = os.path.abspath(__F_PATH__ + '../')
 sys.path.append(__ML_PATH__)
 sys.path.append(__ALGO_PATH__)
 print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')

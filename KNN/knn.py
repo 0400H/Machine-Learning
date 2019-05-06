@@ -2,21 +2,18 @@
 
 #%% Compatible with jupyter
 import os, sys
+
 try:
-    __F_PATH__ = os.path.dirname(os.path.abspath(__file__)) + '/'
+    __ML_PATH__ = os.getcwd() + '/'
+    __F_PATH__ = __ML_PATH__ + 'KNN/'
+    sys.path.append(__ML_PATH__)
+    from Tuning.datatune import *
+except ModuleNotFoundError:
+    __F_PATH__ = os.getcwd() + '/'
     __ML_PATH__ = os.path.abspath(__F_PATH__ + '../')
-except NameError:
-    try:
-        __F_PATH__ = os.getcwd() + '/'
-        __ML_PATH__ = os.path.abspath(__F_PATH__ + '../')
-        from Tuning.datatune import *
-    except ModuleNotFoundError:
-        __ML_PATH__ = os.getcwd() + '/'
-        __F_PATH__ = __ML_PATH__ + 'KNN/'
-        pass
     pass
+__ALGO_PATH__ = __F_PATH__
 sys.path.append(__ML_PATH__)
-sys.path.append(__F_PATH__)
 
 from Tuning.datatune import *
 from sklearn.neighbors import KNeighborsClassifier as kNN
