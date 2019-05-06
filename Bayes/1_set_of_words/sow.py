@@ -15,7 +15,7 @@ except NameError:
         __F_PATH__ = __ML_PATH__ + 'Bayes/1_set_of_words/'
         pass
     pass
-__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/Bayes')
+__ALGO_PATH__ = os.path.abspath(__ML_PATH__ + '/Bayes') + '/'
 sys.path.append(__ML_PATH__)
 sys.path.append(__ALGO_PATH__)
 print(__ML_PATH__, __ALGO_PATH__, __F_PATH__, sep='\n')
@@ -41,20 +41,24 @@ def DataLoader1():
     train_category_vector = [0, 1, 0, 1, 0, 1] # 二分类
     return train_entry_list, train_category_vector, test_entry_list
 
+@jit
 def DataLoader2():
     entry_list, category_vector = [], []
     for i in range(1, 26):
-        text = open(__ALGO_PATH__ + './email/spam/%d.txt' % i, 'r').read()
-        wordList = TextParse(text)
+        text = open(__ALGO_PATH__ + 'email/spam/%d.txt' % i, 'r')
+        wordList = TextParse(text.read())
         entry_list.append(wordList)
         category_vector.append(1)          # 标记垃圾邮件，1表示垃圾文件
-        text = open(__ALGO_PATH__ + './email/ham/%d.txt' % i, 'r').read()
-        wordList = TextParse(text)
+        text.close()
+        text = open(__ALGO_PATH__ + 'email/ham/%d.txt' % i, 'r')
+        wordList = TextParse(text.read())
         entry_list.append(wordList)
         category_vector.append(0)
+        text.close()
 
     return entry_list, category_vector
 
+@jit
 def EntryList2Glossary(entry_list):
     glossary = set([])
     for entry in entry_list:
@@ -72,15 +76,16 @@ def Entry2GlossaryMask(glossary, entry):
     return glossary_mask
 
 # 接收一个大字符串并将其解析为字符串列表
+@jit
 def TextParse(bigString):                                                   #将字符串转换为字符列表
-    listOfTokens = re.split(r'\W*', bigString)                              #将特殊符号作为切分标志进行字符串切分，即非字母、非数字
+    listOfTokens = re.split(pattern=r'\W*', string=bigString)               #将特殊符号作为切分标志进行字符串切分，即非字母、非数字
     entry = [tok.lower() for tok in listOfTokens if len(tok) > 2]           #除了单个字母，例如大写的I，其它单词变成小写
     return entry
 
 """
 函数说明: 验证朴素贝叶斯分类器
 """
-# @jit
+@jit
 def sow_val(entry_list, category_vector, with_log, rate=0.2):
     myGlossary = EntryList2Glossary(entry_list)
     entry_num = len(entry_list)

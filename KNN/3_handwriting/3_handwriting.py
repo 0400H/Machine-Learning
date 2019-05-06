@@ -56,7 +56,7 @@ def classify_test(class_classifier):
         testcase = test_data[index]
         label = test_labels[index]
         classify_result = classifier.classify(testcase)
-        info("分类返回结果为%d\t真实结果为%d" % (classify_result, label))
+        info("分类返回结果为%d, 真实结果为%d" % (classify_result, label))
         if (classify_result != label):
             errorCount += 1.0
     info("总共错了%d个数据, 错误率为%f%%" % (errorCount, errorCount/test_num))

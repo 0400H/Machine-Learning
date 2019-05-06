@@ -45,4 +45,4 @@ if __name__ == '__main__':
     for testcase in test_dataset:
         category_1 = classifier_1.classify(testcase)
         category_2 = classifier_2.classify(testcase)
-        print(testcase, ': ', category_1, category_2[0])
+        info(testcase, ':', category_1, category_2[0])
