@@ -80,7 +80,7 @@ def TextParse(bigString):                                                   #将
 """
 函数说明: 验证朴素贝叶斯分类器
 """
-@jit
+# @jit
 def sow_val(entry_list, category_vector, with_log, rate=0.2):
     myGlossary = EntryList2Glossary(entry_list)
     entry_num = len(entry_list)

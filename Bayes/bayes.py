@@ -57,16 +57,17 @@ class native_bayes(object):
         return None
 
     def classify(self, entry, with_log = False):
-        # # 只保留entry存在的word的概率
+        # 只保留entry存在的word的概率
         p_entry_mask_0 = self.p_word_0[entry > 0]
         p_entry_mask_1 = self.p_word_1[entry > 0]
+        p_0_entry, p_1_entry = None, None
 
         if with_log == False:
             p_entry_mask_0 = np.log(p_entry_mask_0)
             p_entry_mask_1 = np.log(p_entry_mask_1)
 
-            p_1_entry = sum(p_entry_mask_1) + np.log(self.p_1_entry)
-            p_0_entry = sum(p_entry_mask_0) + np.log(1.0 - self.p_1_entry)
+            p_1_entry = np.sum(p_entry_mask_1) + np.log(self.p_1_entry)
+            p_0_entry = np.sum(p_entry_mask_0) + np.log(1.0 - self.p_1_entry)
         else:
             p_1_entry = reduce(lambda x1,x2: x1*x2, p_entry_mask_1) * self.p_1_entry
             p_0_entry = reduce(lambda x1,x2: x1*x2, p_entry_mask_0) * (1.0 - self.p_1_entry)
@@ -74,4 +75,4 @@ class native_bayes(object):
         # info(p_0_entry, p_1_entry)
         return (0, 1)[p_1_entry > p_0_entry]
 
-pass
+    pass
