@@ -22,7 +22,6 @@ from Tuning.datatune import *
 from Tuning.logger import info
 
 # %% Function description: read data_array, labels from csv
-@jit
 def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim):
     (h_start, h_end), (w_start, w_end) = batch_dim, feature_dim
     data_array = file2array1(filename, np.str, nop, interval)
@@ -40,6 +39,6 @@ if __name__ == '__main__':
     classifier_2 = knn_sklearn(val_data, val_labels, 3)
 
     for testcase in test_dataset:
-        category_1 = classifier_1.classify(testcase)
-        category_2 = classifier_2.classify(testcase)
+        category_1 = classifier_1.predict(testcase)
+        category_2 = classifier_2.predict(testcase)
         info(testcase, ':', category_1, category_2[0])

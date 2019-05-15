@@ -2,7 +2,7 @@
 
 import numpy as np
 
-class estimate_numpy (object) :
+class estimate_numpy (object):
     def __init__(self):
         return None
 
@@ -14,7 +14,7 @@ class estimate_numpy (object) :
                     string_index = line.index(keyword) + len(keyword)
                     string = str(line[string_index: ]).strip('\n').strip('ms.')
                     data_list.append(float(string))
-                else :
+                else:
                     continue
             length = len(data_list)
             data_array = np.array(data_list)
@@ -24,35 +24,35 @@ class estimate_numpy (object) :
         if len(data_array) < length :
             print('len of data_array is loss than length')
             return None
-        else :
+        else:
             return np.sum(data_array[:length]) / length
 
     def get_max_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
             return None
-        else :
+        else:
             return np.max(data_array[:length])
 
     def get_min_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
             return None
-        else :
+        else:
             return np.min(data_array[:length])
 
     def get_sq_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
             return None
-        else :
+        else:
             return np.var(data_array[:length])
 
     def get_std_from_data(self, data_array, length = 0):
         if len(data_array) < length :
             print('len of data_array is loss than length')
             return None
-        else :
+        else:
             return np.std(data_array[:length])
 
 pass

@@ -3,16 +3,16 @@
 from __future__ import print_function
 import time, os, traceback
 
-def get_time() :
+def get_time():
     current_time = time.time()
     current_ms = str(':') + str(round(current_time * 1000000))[-6:]
     current_time = time.strftime("%Y/%m/%d | %H:%M:%S", time.localtime()) + current_ms
     return current_time
 
-def get_pid() :
+def get_pid():
     return str(os.getpid())
 
-def info(*args) :
+def info(*args):
     print('[ {} | {} ]'.format(get_time(), get_pid()), *args)
     return None
 

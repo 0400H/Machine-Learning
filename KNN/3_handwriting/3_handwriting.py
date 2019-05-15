@@ -30,18 +30,15 @@ def data_loader(dateset_dir):
 
     for i in range(case_num):
         filename = file_list[i]
-        classify_number = int(filename.split('_')[0])
-        labels.append(classify_number)
+        predict_number = int(filename.split('_')[0])
+        labels.append(predict_number)
         data_array[i] = img2col(dateset_dir + '/' + filename, 0, 32, 0, 32, np.int, 'utf-8')
 
     return data_array, labels
 
-"""
-函数说明: 手写数字分类测试
-"""
+# 手写数字分类测试
 @jit
-def classify_test(class_classifier):
-    # verification, test
+def predict_test(class_classifier):
     ver_data, ver_labels = data_loader(__F_PATH__ + 'trainingDigits')
     test_data, test_labels = data_loader(__F_PATH__ + 'testDigits')
 
@@ -52,12 +49,12 @@ def classify_test(class_classifier):
     for index in range(test_num):
         testcase = test_data[index]
         label = test_labels[index]
-        classify_result = classifier.classify(testcase)
-        info("分类返回结果为%d, 真实结果为%d" % (classify_result, label))
-        if (classify_result != label):
+        predict_result = classifier.predict(testcase)
+        info("分类返回结果为%d, 真实结果为%d" % (predict_result, label))
+        if (predict_result != label):
             errorCount += 1.0
     info("总共错了%d个数据, 错误率为%f%%" % (errorCount, errorCount/test_num))
 
 if __name__ == '__main__':
-    classify_test(knn)
-    classify_test(knn_sklearn)
+    predict_test(knn)
+    predict_test(knn_sklearn)
