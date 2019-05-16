@@ -1,20 +1,25 @@
 # -*- coding:UTF-8 -*-
 
-import os
-from sys import path
-__Father_Root__ = os.path.dirname(os.path.abspath(__file__)) + '/'
-__Project_Root__ = os.path.dirname(__Father_Root__ + '../')
-path.append(__Project_Root__)
+#%% Compatible with jupyter
+import os, sys
 
+try:
+    __ML_PATH__ = os.getcwd() + '/'
+    __F_PATH__ = __ML_PATH__ + 'Logistic/'
+    sys.path.append(__ML_PATH__)
+    from Tuning.datatune import *
+except ModuleNotFoundError:
+    __F_PATH__ = os.getcwd() + '/'
+    __ML_PATH__ = os.path.abspath(__F_PATH__ + '../')
+    pass
+__ALGO_PATH__ = __F_PATH__
+sys.path.append(__ML_PATH__)
+
+from Tuning.math import *
 from Tuning.datatune import *
 import matplotlib.pyplot as plt
 import numpy as np
-
-"""
-函数说明: sigmoid函数
-"""
-def sigmoid(inX):
-    return 1.0 / (1 + np.exp(-inX))
+from sympy import *
 
 """
 函数说明: f(x) = -x^2 + 233x的导数
@@ -45,7 +50,7 @@ def gradient_ascent_vector(func_derivative, learn_rate=1e-2, precision=1e-8):
              'bold', 'red', u'x', 7, 'bold', 'black', u'f', 7, 'bold', 'black')
     data2plt(figure[1], x_list, f_d_list, 'orange', 5, 0.5, u'', 9,
              'bold', 'red', u'x', 7, 'bold', 'black', u'f\'', 7, 'bold', 'black')
-    show_pyplot(plt)
+    plt.show(canvas)
 
     # Iterative calculation of extremum
     x_old = 0
@@ -83,7 +88,7 @@ def gradient_ascent_matrix(data_ndarray, label_list, learn_rate=1e-2, precision=
 函数说明:绘制数据集
 """
 def plotBestFit(weights):
-    data_matrix, label_matrix = data_loader(__Father_Root__ + 'testSet.csv')
+    data_matrix, label_matrix = data_loader(__F_PATH__ + 'testSet.csv')
     num = np.shape(data_matrix)[0]
     xcord1, ycord1 = [], []                                               #正样本
     xcord2, ycord2 = [], []                                               #负样本
@@ -111,7 +116,7 @@ if __name__ == '__main__':
     extremum, num_iter = gradient_ascent_vector(f_derivative, 1e-1, 1e-8)
     print('extremum: %f, learn_rate: %.2e, precision: %.2e, iteration: %d' % (float(extremum), 1e-1, 1e-8, num_iter))
 
-    data_matrix, label_matrix = data_loader(__Father_Root__ + 'testSet.csv')
+    data_matrix, label_matrix = data_loader(__F_PATH__ + 'testSet.csv')
     weights, num_iter = gradient_ascent_matrix(data_matrix, label_matrix, 1.2e-2, 1e-8)
     print('learn_rate: %.2e, precision: %.2e, iteration: %d' % (1.2e-2, 1e-8, num_iter))
     plotBestFit(weights)
