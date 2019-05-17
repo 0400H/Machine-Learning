@@ -20,33 +20,40 @@ from iteration import *
 
 def func1():
     s_x = sympy.Symbol('x')
+    # 6*x^5-5*x^4-4*x^3+3*x^2
     s_f = 6*s_x**5-5*s_x**4-4*s_x**3+3*s_x**2
     return s_f, s_x
 
 def func2():
     s_x, s_y = sympy.symbols('x y')
-    s_f = s_x**2 + s_y
+    # 2*(x+3)^2 + 4*(y-5)^2 + 6
+    s_f = 2*(s_x+3)**2 + 4*(s_y-5)**2 + 6
+    return s_f, s_x, s_y
+
+def func3():
+    s_x, s_y = sympy.symbols('x y')
+    s_f = s_x**4 - 8*s_x*s_y + 2*s_y**2 - 3
     return s_f, s_x, s_y
 
 if __name__ == '__main__':
-    s_c = symbol_compute()
+    s_c = iteration()
 
-    # 导数
     s_f, *s_args = func1()
     s_c.s_init(s_f, *s_args)
-    v_fx = s_c.v_func(10)
-    s_dfx = s_c.s_dfunc(s_c.s_args[0])
-    v_dfx = s_c.v_dfunc(s_dfx, s_c.s_args[0], 10)
-    info_format = '{}, {}, {}, {}'
-    info(info_format.format(s_f, s_dfx, v_fx, v_dfx))
+    info(s_c.newtons_root(1e-10, -100))
+    info(s_c.newtons_root(1e-10, -0.5))
+    info(s_c.newtons_root(1e-10, 100))
+    info(s_c.gradient('descent', 1e-2, 2e-8, 0.5))
+    info(s_c.gradient('descent', 1e-1, 1e-8, 0.1))
+    info(s_c.gradient('boosting', 1e-2, 1e-8, -0.5))
+    info(s_c.gradient('boosting', 1e-1, 1e-8, 0.1))
 
-    # 偏导数
     s_f, *s_args = func2()
     s_c.s_init(s_f, *s_args)
-    v_f = s_c.v_func(10, 1)
-    s_dfx = s_c.s_dfunc(s_c.s_args[0])
-    v_dfx = s_c.v_dfunc(s_dfx, s_c.s_args[0], 10)
-    s_dfy = s_c.s_dfunc(s_c.s_args[1])
-    v_dfy = s_c.v_dfunc(s_dfy, s_c.s_args[1], 10)
-    info_format = '{}, {}, {}, {}, {}, {}'
-    info(info_format.format(s_f, s_dfx, s_dfy, v_f, v_dfx, v_dfy))
+    # info(s_c.newtons_root(1e-8, -10, 10))
+    info(s_c.gradient('descent', 1e-1, 1e-8, -100, -100))
+
+    s_f, *s_args = func3()
+    s_c.s_init(s_f, *s_args)
+    # info(s_c.newtons_root(1e-8, 1, 10))
+    info(s_c.gradient('descent', 5e-3, 1e-8, 10, 10))

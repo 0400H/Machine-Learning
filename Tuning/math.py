@@ -10,5 +10,5 @@ def sigmoid(X):
 def l2_distance(X, Y, dim=1):
     return np.sqrt(np.sum(np.square(X - Y), axis=dim))
 
-def abs_error(func, x):
-    return np.abs(func(x))
+def abs_error(func, *args):
+    return np.abs(func(*args))
