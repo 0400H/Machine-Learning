@@ -28,7 +28,9 @@ def data_loader(filename):
     return data_array, label_array
 
 """
-函数说明: 梯度上升算法求解 L(w) = Y*W_T*X - Ln(1+e^(W_T*X)) 的 W_T
+函数说明: 梯度上升算法求解使
+         L(w) = Y*W_T*X - Ln(1+e^(W_T*X))
+         获取最大值的 W_T
 Parameters:
     data_ndarray - 数据集 N*K
     label_list - 数据标签 N*K

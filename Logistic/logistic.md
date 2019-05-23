@@ -14,16 +14,15 @@ Space complexity|O()
 ## Algorithm math description:
 #### Single-Nominal Logistic Regression model:
 $$\tag{1.0}
-sigmoid(W^{T} X_i) = \frac
-{ 1 } { 1 + exp(W^{T} X_i) }
+sigmoid(X)
+= \frac { exp(X) } { 1 + exp(X) }
+= \frac { 1 } { 1 + exp(-X) }
 $$
 $$\tag{1.1}
-P(y_i=1|X_i) = \frac
-{ exp(W^{T} X_i) }
-{ 1 + exp(W^{T} X_i) }
+P(y_i=0|X_i) = 1 - sigmoid(W^{T} X_i)
 $$
 $$\tag{1.2}
-P(y_i=0|X_i) = sigmoid(W^{T} X_i)
+P(y_i=1|X_i) = sigmoid(W^{T} X_i)
 $$
 $$
 \tag{1.3}
@@ -34,16 +33,16 @@ $$
 $$
 \tag{1.4}
 ln(L(W)) = \sum^n_{i=1} [
-    y_i * ln(\frac
-        { P(y_i=1|X_i) }
-        { P(y_i=0|X_i) }
-    ) + ln( P(y_i=0|X_i) )
+    y_i * ln(P(y_i=1|X_i) +
+    (1 - y_i) * ln(P(y_i=0|X_i)
 ]
 $$
 $$
 = \sum^n_{i=1} [
-    y_i * ln(P(y_i=1|X_i) +
-    (1 - y_i) * ln(P(y_i=0|X_i)
+    y_i * ln(\frac
+        { P(y_i=1|X_i) }
+        { P(y_i=0|X_i) }
+    ) + ln( P(y_i=0|X_i) )
 ]
 $$
 $$
@@ -55,10 +54,10 @@ $$
 $$
 \tag{1.5}
 ln(L(W))^{'}_W = 
-YX_i - X_i \frac
+YX_i - \frac
     { exp(W^{T} X_i) X_i }
     { 1 + exp(W^{T} X_i) }
-= [Y - 1 + sigmoid(W^{T} X_i)] X_i
+= [Y - sigmoid(W^{T} X_i)] X_i
 $$
 
 #### Multi-Nominal Logistic Regression model:
