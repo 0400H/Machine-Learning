@@ -32,7 +32,7 @@ L(W) = \prod_{i=1}^n
 $$
 $$
 \tag{1.4}
-ln(L(W)) = \sum^n_{i=1} [
+ln[L(W)] = \sum^n_{i=1} [
     y_i * ln(P(y_i=1|X_i) +
     (1 - y_i) * ln(P(y_i=0|X_i)
 ]
@@ -53,13 +53,17 @@ $$
 $$
 $$
 \tag{1.5}
-ln(L(W))^{'}_W = 
-YX_i - \frac
-    { exp(W^{T} X_i) X_i }
-    { 1 + exp(W^{T} X_i) }
-= [Y - sigmoid(W^{T} X_i)] X_i
+[y_i * (W^{T} X_i) - ln(1 + exp(W^{T} X_i))]^{'} = 
+y_i * X_i -
+\frac { exp(W^{T} X_i) * X_i }
+        { 1 + exp(W^{T} X_i) }
+= [y_i - sigmoid(W^{T} X_i)] * X_i
 $$
-
+$$
+\tag{1.6}
+ln[L(W)]^{'}_W =
+[[Y - sigmoid(W^{T} X)]X^{T}]^{T}
+$$
 #### Multi-Nominal Logistic Regression model:
 $$\tag{2.1}
 P(y_i=k|X_i) = \frac

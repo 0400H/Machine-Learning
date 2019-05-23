@@ -32,24 +32,29 @@ def data_loader(filename):
          L(w) = Y*W_T*X - Ln(1+e^(W_T*X))
          获取最大值的 W_T
 Parameters:
-    data_ndarray - 数据集 N*K
+    data_array - 数据集 N*K
     label_list - 数据标签 N*K
 Returns:
     weights.getA() - 求得的权重矩阵(最优参数)
 """
-def gradient_ascent_matrix(data_ndarray, label_list, learn_rate=1e-2, precision=1e-8):
-    data_marix = data_ndarray
-    k = np.shape(data_marix)[1]
-    weights = np.ones(shape=(k, 1), dtype=np.float)
+def logistic_gradient_ascent(data_array, label_list, learn_rate=1e-2, precision=1e-8):
+    data_array = data_array
+    feature_size = np.shape(data_array)[1]
+    weights = np.ones(shape=(feature_size, 1), dtype=np.float)
     label_matrix = np.array(label_list).reshape(-1, 1)
-    avg_abs_loss, num_iter = 2*precision, 0
-    while (avg_abs_loss >= precision):
-        result = sigmoid(np.dot(data_marix, weights))
-        loss = label_matrix - result
-        weights += learn_rate * np.dot(data_marix.transpose(), loss)
-        avg_abs_loss = abs(np.average(loss))
+    df = label_matrix - sigmoid(np.dot(data_array, weights))
+    df = np.dot(data_array.transpose(), df)
+    abs_df = np.abs(np.sum(df))
+
+    num_iter = 0
+    while abs_df >= precision:
+        df = label_matrix - sigmoid(np.dot(data_array, weights))
+        df = np.dot(data_array.transpose(), df)
+        abs_df = np.abs(np.average(df))
+        weights += learn_rate * df
         num_iter += 1
-    return weights, num_iter                  # matrix to ndarray
+        print(num_iter, abs_df)
+    return weights, num_iter
 
 """
 函数说明:绘制数据集
@@ -81,6 +86,6 @@ def plotBestFit(weights):
 
 if __name__ == '__main__':
     data_matrix, label_matrix = data_loader(__F_PATH__ + 'testSet.csv')
-    weights, num_iter = gradient_ascent_matrix(data_matrix, label_matrix, 1.2e-2, 1e-8)
+    weights, num_iter = logistic_gradient_ascent(data_matrix, label_matrix, 1.2e-2, 1e-8)
     print('learn_rate: %.2e, precision: %.2e, iteration: %d' % (1.2e-2, 1e-8, num_iter))
     plotBestFit(weights)
