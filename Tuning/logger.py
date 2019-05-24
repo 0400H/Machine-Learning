@@ -22,9 +22,7 @@ def catch_error(function):
             function(*argc, **argv)
         except:
             error_msg = traceback.format_exc()
-            error_msg = error_msg.split('\n')[3:-1]
-            for msg in error_msg:
-                info(msg.lstrip())
+            info(error_msg)
     return wrapper
 
 if __name__ == '__main__' :

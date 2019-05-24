@@ -29,7 +29,6 @@ def data_loader(filename, nop, interval, batch_dim, feature_dim, label_dim):
     labels = data2col(data_array, h_start, h_end, label_dim, label_dim+1, np.str)
     return data, labels
 
-
 #%%
 if __name__ == '__main__':
     val_data, val_labels = data_loader(__F_PATH__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)

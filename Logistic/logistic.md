@@ -12,7 +12,7 @@ time complexity|O()
 Space complexity|O()
 #
 ## Algorithm math description:
-#### Single-Nominal Logistic Regression model:
+#### Logistic Regression model:
 $$\tag{1.0}
 sigmoid(X)
 = \frac { exp(X) } { 1 + exp(X) }
@@ -25,7 +25,7 @@ $$\tag{1.2}
 P(y_i=1|X_i) = sigmoid(W^{T} X_i)
 $$
 $$
-\tag{1.3}
+\tag{1.k}
 L(W) = \prod_{i=1}^n
 [ P(y_i=1|X_i) ]^{y_i}
 [ P(y_i=0|X_i) ]^{1 - y_i}
@@ -62,7 +62,17 @@ $$
 $$
 \tag{1.6}
 ln[L(W)]^{'}_W =
-[[Y - sigmoid(W^{T} X)]X^{T}]^{T}
+[[Y - sigmoid(W^{T} X)]X^{T}]^{T},
+Y \in R_{1 * m},
+W \in R_{k * 1},
+X \in R_{k * m}
+$$
+$$
+ln[L(W)]^{'}_W =
+X [Y - sigmoid(X W)],
+Y \in R_{m * 1},
+X \in R_{m * k},
+W \in R_{k * 1},
 $$
 #### Multi-Nominal Logistic Regression model:
 $$\tag{2.1}
