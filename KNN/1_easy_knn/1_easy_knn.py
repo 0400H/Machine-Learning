@@ -2,7 +2,6 @@
 
 #%% Compatible with jupyter
 import os, sys
-
 try:
     __ML_PATH__ = os.getcwd() + '/'
     __F_PATH__ = __ML_PATH__ + 'KNN/1_easy_knn/'
@@ -34,8 +33,8 @@ if __name__ == '__main__':
     val_data, val_labels = data_loader(__F_PATH__ + 'knn.csv', '#', ',', (0, 9), (1, 3), 0)
     test_dataset = np.array([[3, 11], [31, 42], [79, 80]])
 
-    classifier_1 = knn(val_data, val_labels, 3)
-    classifier_2 = knn_sklearn(val_data, val_labels, 3)
+    classifier_1 = knn(3).fit(val_data, val_labels)
+    classifier_2 = knn_sklearn(3).fit(val_data, val_labels)
 
     for testcase in test_dataset:
         category_1 = classifier_1.predict(testcase)

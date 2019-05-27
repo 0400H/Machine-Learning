@@ -2,7 +2,6 @@
 
 #%% Compatible with jupyter
 import os, sys
-
 try:
     __ML_PATH__ = os.getcwd() + '/'
     __F_PATH__ = __ML_PATH__ + 'Bayes/'
@@ -63,8 +62,8 @@ def TextParse(bigString):                                                   #将
 """
 函数说明: 朴素贝叶斯分类器训练函数
 Parameters:
-    entry_feature_list - 训练文档矩阵，即EntryEncode返回的glossary_mask构成的矩阵
-    category_vector - 训练类别标签向量，即DataLoader返回的category_vector
+    data_array - 训练文档矩阵，即EntryEncode返回的glossary_mask构成的entry_feature_list 
+    label_array - 训练类别标签向量，即DataLoader返回的category_vector
 Returns:
     p_word_0 - 对类别为1的所有entry, 统计glossary中的每个单词类出现的概率
     p_word_1 - 对类别为0的所有entry, 统计glossary中的每个单词类出现的概率
@@ -76,27 +75,27 @@ class native_bayes(object):
         using Laplace smoothing to quantized input(>=0) to (0.0, 1.0]
     """
     @jit
-    def fit(self, entry_feature_list, category_vector, laplace_smooth=True):
-        entry_num = len(entry_feature_list)
-        self.p_1_entry_feature = np.sum(category_vector)/entry_num
+    def fit(self, data_array, label_array, laplace_smooth=True):
+        entry_num = len(data_array)
+        self.p_1_entry_feature = np.sum(label_array)/entry_num
 
-        entry_feature_list = np.array(entry_feature_list, dtype=np.float)
-        category_vector = np.array(category_vector)
+        data_array = np.array(data_array, dtype=np.float)
+        label_array = np.array(label_array)
 
         laplace = (0, 1)[laplace_smooth]
         class_0_mask_list_sum = laplace
         class_1_mask_list_sum = laplace
 
         for i in range(entry_num):
-            if category_vector[i] == 1:
-                class_1_mask_list_sum += entry_feature_list[i]
+            if label_array[i] == 1:
+                class_1_mask_list_sum += data_array[i]
             else:
-                class_0_mask_list_sum += entry_feature_list[i]
+                class_0_mask_list_sum += data_array[i]
         class_0_mask_sum = np.sum(class_0_mask_list_sum)
         class_1_mask_sum = np.sum(class_1_mask_list_sum)
         self.p_word_0 = class_0_mask_list_sum / class_0_mask_sum
         self.p_word_1 = class_1_mask_list_sum / class_1_mask_sum
-        return None
+        return self
 
     # use test or val data
     def predict(self, entry_feature, with_log=False):
@@ -128,9 +127,9 @@ class native_bayes_sklearn(object):
 
     # use training data
     @jit
-    def fit(self, entry_feature_list, category_vector):
-        self.classifier.fit(np.array(entry_feature_list), np.array(category_vector))
-        return None
+    def fit(self, data_array, label_array):
+        self.classifier.fit(np.array(data_array), np.array(label_array))
+        return self
 
     # use test or val data
     @jit
@@ -140,8 +139,8 @@ class native_bayes_sklearn(object):
 
     # use test or val data
     @jit
-    def score(self, entry_feature_list, category_vector):
-        score_result = self.classifier.score(np.array(entry_feature_list), np.array(category_vector))
+    def score(self, data_array, label_array):
+        score_result = self.classifier.score(np.array(data_array), np.array(label_array))
         return score_result.item()
 
     pass

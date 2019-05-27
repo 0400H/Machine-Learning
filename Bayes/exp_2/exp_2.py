@@ -2,7 +2,6 @@
 
 #%% Compatible with jupyter
 import os, sys
-
 try:
     __ML_PATH__ = os.getcwd() + '/'
     __F_PATH__ = __ML_PATH__ + 'Bayes/exp_2/'

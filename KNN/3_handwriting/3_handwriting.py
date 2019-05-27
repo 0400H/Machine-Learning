@@ -2,7 +2,6 @@
 
 #%% Compatible with jupyter
 import os, sys
-
 try:
     __ML_PATH__ = os.getcwd() + '/'
     __F_PATH__ = __ML_PATH__ + 'KNN/3_handwriting/'
@@ -37,24 +36,14 @@ def data_loader(dateset_dir):
     return data_array, labels
 
 # 手写数字分类测试
-@jit
-def predict_test(class_classifier):
+def predict_test(knn_classifier):
     ver_data, ver_labels = data_loader(__F_PATH__ + 'trainingDigits')
     test_data, test_labels = data_loader(__F_PATH__ + 'testDigits')
 
-    classifier = class_classifier(ver_data, ver_labels, 3)
-
-    errorCount = 0.0
-    test_num = len(test_labels)
-    for index in range(test_num):
-        testcase = test_data[index]
-        label = test_labels[index]
-        predict_result = classifier.predict(testcase)
-        info("分类返回结果为%d, 真实结果为%d" % (predict_result, label))
-        if (predict_result != label):
-            errorCount += 1.0
-    info("总共错了%d个数据, 错误率为%f%%" % (errorCount, errorCount/test_num))
+    classifier = knn_classifier(3).fit(ver_data, ver_labels)
+    score = classifier.score(test_data, test_labels)
+    info('score:', score)
 
 if __name__ == '__main__':
-    predict_test(knn)
     predict_test(knn_sklearn)
+    predict_test(knn)

@@ -2,7 +2,6 @@
 
 #%% Compatible with jupyter
 import os, sys
-
 try:
     __ML_PATH__ = os.getcwd() + '/'
     __F_PATH__ = __ML_PATH__ + 'KNN/2_person_knn/'
@@ -47,7 +46,7 @@ def predict_validation(data_array, label_array, ratio, k):
     errorCount = 0.0
     labels_dict = {1:'didntLike', 2:'smallDoses', 3:'largeDoses'}
 
-    classifier = knn(data_norm, label_array, k)
+    classifier = knn(k).fit(data_norm, label_array)
     for i in range(val_ratio_num):
         predict_Result = classifier.predict(data_norm[i])
         info("correction: %s, { prediction: %s, reality: %s }" % (predict_Result == label_array[i],
@@ -74,7 +73,7 @@ def predict_test(data_array, label_array, k):
     norminArr = (inArr - minVals) / ranges
 
     # 返回分类结果
-    classifier = knn(data_norm, label_array, k)
+    classifier = knn(k).fit(data_norm, label_array)
     predict_Result = classifier.predict(norminArr)
 
     resultList = ['didntLike','smallDoses','largeDoses']

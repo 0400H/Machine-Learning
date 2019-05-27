@@ -25,8 +25,8 @@ from logistic import *
 # y = w0 * x1 + w1 * x2 + w2
 def data_loader(filename):
     file_array = file2array2(filename, np.str, '\t', 'utf-8')
-    label_array = file_array[:, -1].reshape(-1).astype(np.float)
-    data_array = np.ones(shape=(len(file_array), 3), dtype=np.float)
+    label_array = file_array[:, -1].reshape(-1).astype(np.int)
+    data_array = np.ones(shape=(len(file_array), len(file_array[0])), dtype=np.float)
     # X_i {x1, x2, 1} W_i {w1, w2, w3(bias)}
     data_array[:, :-1] = file_array[:, :-1].astype(np.float)
     return data_array, label_array
@@ -34,48 +34,52 @@ def data_loader(filename):
 """
 函数说明:绘制数据集
 """
-def plotBestFit(data_matrix, label_matrix, weights):
-    x1cord1, x2cord1 = [], []                                               #正样本
-    x1cord2, x2cord2 = [], []                                               #负样本
-    for index in range(len(label_matrix)):                                  #根据数据集标签进行分类
-        if int(label_matrix[index]) == 1:
-            x1cord1.append(data_matrix[index, 0])
-            x2cord1.append(data_matrix[index, 1])
-        else:
-            x1cord2.append(data_matrix[index, 0])
-            x2cord2.append(data_matrix[index, 1])
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(x1cord1, x2cord1, s = 20, c = 'red', marker = 's', alpha=.5)
-    ax.scatter(x1cord2, x2cord2, s = 20, c = 'green', marker = 's', alpha=.5)
-    x1 = np.arange(-3.0, 3.0, 0.1)
-    x2 = -(weights[2] + weights[0] * x1) / weights[1]
-    ax.plot(x1, x2)
-    plt.title('BestFit')
-    plt.xlabel('X1');
-    plt.ylabel('X2')
-    plt.show()
+def plotBestFit(data_array, label_array, weight_historys):
+    # draw predict line
+    weight_size = len(weight_historys)
+    feature_size = weight_historys[0].shape[1]
+    canvas, figure = plt.subplots(nrows=feature_size+1, ncols=weight_size,
+                                  sharex=False, sharey=False, figsize=(5, 5))
 
-# def plotBestFit(data_matrix, label_matrix, weights):
-#     # 将fig画布分隔成1行1列,不共享x轴和y轴,fig画布的大小为(13,8)
-#     canvas, figure = plt.subplots(nrows=2, ncols=2, sharex=False, sharey=False, figsize=(13, 8))
+    for index in range(weight_size):
+        weight_history = weight_historys[index]
+        weight = weight_history[-1]
 
-#     Legends = [['didntLike', 'smallDoses', 'largeDoses'], ['black', 'orange', 'red']]
-#     LabelsColors = [Legends[1][i-1] for i in label_array]
+        Legends = [['False', 'True'], ['black', 'red']]
+        LabelsColors = [Legends[1][i] for i in label_array]
+        plt_draw2d(figure[0][index], data_array[:, 0], data_array[:, 1],
+                   LabelsColors, 'scatter', Legends, u'', u'X1', u'X2', 10, 1)
+        X1 = np.arange(-3.0, 3.0, 0.1)
+        X2 = -(weight[2] + weight[0] * X1) / weight[1]
+        plt_draw2d(figure[0][index], X1, X2, 'green', 'line',
+                   Legends, u'', u'X1', u'X2', 10, 1)
 
-#     # 以data_array矩阵的第一列(hobby1)、第二列(hobby2)数据画散点图
-#     plt_draw2d(figure[0][0], data_array[:,0], data_array[:,1], LabelsColors,
-#               'scatter', Legends, u'', u'hobby1 times', u'hobby2 times')
-#     plt.show()
+        iteration = weight_history.shape[0]
+        iter_array = np.arange(0, iteration, 1)
+        for idx in range(feature_size):
+            plt_draw2d(figure[idx+1][index], iter_array, weight_history[:, idx],
+                       'red', 'line', '', '', 'iteration', 'W' + str(idx), 1, 1)
+    plt_add_title(figure[0][0], 'logistic with batch gradient boost method')
+    plt_add_title(figure[0][1], 'logistic with stochastic gradient boost method')
+    plt.show(canvas)
+
+def logistic_val(data_array, label_array):
+    classifier = logistic()
+    _, num_iter = classifier.fit(data_array, label_array, 1e-2, 1e-2, 'bgb', True)
+    gb_weight_history = classifier.weight_history
+    val_result = classifier.predict(data_array)
+    error_rate = np.average(np.abs(val_result - label_array))
+    info('error_rate: {}, iteration: {}'.format(error_rate, num_iter))
+
+    _, num_iter = classifier.fit(data_array, label_array, 1e-2, 1e-2, 'sgb', True)
+    sgb_weight_history = classifier.weight_history
+    val_result = classifier.predict(data_array)
+    error_rate = np.average(np.abs(val_result - label_array))
+    info('error_rate: {}, iteration: {}'.format(error_rate, num_iter))
+
+    return gb_weight_history, sgb_weight_history
 
 #%%
 if __name__ == '__main__':
-    data_matrix, label_matrix = data_loader(__F_PATH__ + 'testSet.csv')
-
-    classifier = logistic()
-    weight, num_iter = classifier.fit(data_matrix, label_matrix, 1e-2, 1e-2)
-    predict_result = classifier.predict(data_matrix)
-    error_rate = np.average(predict_result - label_matrix.reshape(-1))
-    info('error_rate: {}, iteration: {}'.format(error_rate, num_iter))
-
-    plotBestFit(data_matrix, label_matrix, weight)
+    data_array, label_array = data_loader(__F_PATH__ + 'testSet.csv')
+    plotBestFit(data_array, label_array, logistic_val(data_array, label_array))
