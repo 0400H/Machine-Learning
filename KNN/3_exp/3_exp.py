@@ -4,7 +4,7 @@
 import os, sys
 try:
     __ML_PATH__ = os.getcwd() + '/'
-    __F_PATH__ = __ML_PATH__ + 'KNN/3_handwriting/'
+    __F_PATH__ = __ML_PATH__ + 'KNN/3_exp/'
     sys.path.append(__ML_PATH__)
     from Tuning.datatune import *
 except ModuleNotFoundError:

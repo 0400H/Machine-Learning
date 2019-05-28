@@ -1,5 +1,9 @@
 # Native Bayes
 ```
+https://zhuanlan.zhihu.com/p/46928319
+https://zhuanlan.zhihu.com/p/44591359
+https://zhuanlan.zhihu.com/p/34325602
+https://zhuanlan.zhihu.com/p/33543849
 ```
 
 Algorithm description|note

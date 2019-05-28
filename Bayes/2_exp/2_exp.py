@@ -4,7 +4,7 @@
 import os, sys
 try:
     __ML_PATH__ = os.getcwd() + '/'
-    __F_PATH__ = __ML_PATH__ + 'Bayes/exp_2/'
+    __F_PATH__ = __ML_PATH__ + 'Bayes/2_exp/'
     sys.path.append(__ML_PATH__)
     from Tuning.datatune import *
 except ModuleNotFoundError:
