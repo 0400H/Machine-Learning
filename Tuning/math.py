@@ -13,6 +13,10 @@ def softmax(X, dim=0):
     return x_exp / x_exp_sum
 
 def l2_distance(X, Y, dim=1):
+    if len(X.shape) == 1:
+        X = X.reshape(1,-1)
+    if len(Y.shape) == 1:
+        Y = Y.reshape(1,-1)
     return np.sqrt(np.sum(np.square(X - Y), axis=dim))
 
 def abs_error(func, *args):

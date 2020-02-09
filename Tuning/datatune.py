@@ -77,14 +77,15 @@ def File2ListArray(file_path='', jump_out_key=[], enter_key=[], select_key=[], d
         data_list_array.append(np.array(data).astype(dtype))
     return data_list_array, length_list
 
-@jit
+# @jit
 def file2array1(file_path, in_dtype, nop='#', interval='', usecols=None, unpack=False):
     if (interval == ''):
         return np.loadtxt(file_path, dtype=in_dtype, comments=nop)
     else:
         return np.loadtxt(file_path, dtype=in_dtype, comments=nop, delimiter=interval)
+    pass
 
-@jit
+# @jit
 def file2array2(file_path, out_dtype=np.str, interval='', encode='utf-8'):
     file2list = open(file_path, 'r', encoding=encode).readlines()
     # 针对有 BOM 的 UTF-8 文本，应该去掉BOM，否则后面会引发错误。
